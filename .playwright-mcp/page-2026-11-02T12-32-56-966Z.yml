@@ -1,0 +1,167 @@
+- generic [active] [ref=f84e1]:
+  - link "Skip to content" [ref=f84e2] [cursor=pointer]:
+    - /url: "#main"
+  - banner [ref=f84e3]:
+    - generic [ref=f84e4]:
+      - link [ref=f84e5] [cursor=pointer]:
+        - /url: /
+        - img "RiTECHS — Research, Innovation, Technology & Solution" [ref=f84e6]
+      - navigation "Main" [ref=f84e7]:
+        - list [ref=f84e9]:
+          - listitem [ref=f84e10]:
+            - link "Home" [ref=f84e11] [cursor=pointer]:
+              - /url: /
+          - listitem [ref=f84e12]:
+            - button "About" [ref=f84e13]
+          - listitem [ref=f84e16]:
+            - button "Membership" [ref=f84e17]
+          - listitem [ref=f84e20]:
+            - link "Conference" [ref=f84e21] [cursor=pointer]:
+              - /url: /conference
+          - listitem [ref=f84e22]:
+            - link "Publication" [ref=f84e23] [cursor=pointer]:
+              - /url: /publication
+          - listitem [ref=f84e24]:
+            - button "Event" [ref=f84e25]
+          - listitem [ref=f84e28]:
+            - button "Solutions" [ref=f84e29]
+          - listitem [ref=f84e32]:
+            - button "Training" [ref=f84e33]
+          - listitem [ref=f84e36]:
+            - button "Archives" [ref=f84e37]
+      - button "Search" [ref=f84e41]
+  - main [ref=f84e43]:
+    - generic [ref=f84e45]:
+      - complementary [ref=f84e46]:
+        - paragraph [ref=f84e47]: Welcome back to the RiTECHS research community.
+        - list [ref=f84e48]:
+          - listitem [ref=f84e49]: Track your submissions and reviews
+          - listitem [ref=f84e52]: Register for conferences and events
+          - listitem [ref=f84e55]: Message your mentor
+      - generic [ref=f84e58]:
+        - heading "Log in" [level=1] [ref=f84e59]
+        - paragraph [ref=f84e60]:
+          - text: New to RiTECHS? Register as a
+          - link "mentor" [ref=f84e61] [cursor=pointer]:
+            - /url: /register/mentor
+          - text: or a
+          - link "mentee" [ref=f84e62] [cursor=pointer]:
+            - /url: /register/mentee
+          - text: .
+        - generic [ref=f84e63]:
+          - generic [ref=f84e64]:
+            - generic [ref=f84e65]: Email address
+            - textbox "Email address" [ref=f84e67]
+          - generic [ref=f84e68]:
+            - generic [ref=f84e69]: Password
+            - generic [ref=f84e70]:
+              - textbox "Password" [ref=f84e71]
+              - button "Show password" [ref=f84e72]
+          - generic [ref=f84e76]:
+            - generic [ref=f84e77]:
+              - checkbox "Keep me signed in" [checked] [ref=f84e78]
+              - text: Keep me signed in
+            - link "Forgot password?" [ref=f84e79] [cursor=pointer]:
+              - /url: /forgot-password
+          - button "Log In" [ref=f84e80]
+  - contentinfo [ref=f84e81]:
+    - generic [ref=f84e82]:
+      - generic [ref=f84e83]:
+        - generic [ref=f84e84]:
+          - link [ref=f84e85] [cursor=pointer]:
+            - /url: /
+            - img "RiTECHS — Research, Innovation, Technology & Solution" [ref=f84e86]
+          - paragraph [ref=f84e87]: RiTECHS connects researchers, scholars and innovators through publications, international conferences, mentorship and research training.
+          - list "RiTECHS on social media" [ref=f84e88]:
+            - listitem [ref=f84e89]:
+              - link "LinkedIn (opens in a new tab)" [ref=f84e90] [cursor=pointer]:
+                - /url: https://www.linkedin.com/in/ri-tech-solution-0132131b7/
+            - listitem [ref=f84e94]:
+              - link "Facebook (opens in a new tab)" [ref=f84e95] [cursor=pointer]:
+                - /url: https://www.facebook.com/ritechs
+            - listitem [ref=f84e99]:
+              - link "X (opens in a new tab)" [ref=f84e100] [cursor=pointer]:
+                - /url: https://twitter.com/ritechsolution
+            - listitem [ref=f84e104]:
+              - link "Instagram (opens in a new tab)" [ref=f84e105] [cursor=pointer]:
+                - /url: https://www.instagram.com/ritechsolution/
+            - listitem [ref=f84e109]:
+              - link "YouTube (opens in a new tab)" [ref=f84e110] [cursor=pointer]:
+                - /url: https://www.youtube.com/channel/UCRMr7tFy2kgmymRjtgzhAag
+        - generic [ref=f84e114]:
+          - navigation [ref=f84e115]:
+            - heading "For Mentees" [level=2] [ref=f84e116]
+            - list [ref=f84e117]:
+              - listitem [ref=f84e118]:
+                - link "Search mentors" [ref=f84e119] [cursor=pointer]:
+                  - /url: /mentorship
+              - listitem [ref=f84e120]:
+                - link "Become a mentee" [ref=f84e121] [cursor=pointer]:
+                  - /url: /register/mentee
+              - listitem [ref=f84e122]:
+                - link "Log in" [ref=f84e123] [cursor=pointer]:
+                  - /url: /login
+          - navigation [ref=f84e124]:
+            - heading "For Mentors" [level=2] [ref=f84e125]
+            - list [ref=f84e126]:
+              - listitem [ref=f84e127]:
+                - link "Mentoring directory" [ref=f84e128] [cursor=pointer]:
+                  - /url: /mentorship
+              - listitem [ref=f84e129]:
+                - link "Become a mentor" [ref=f84e130] [cursor=pointer]:
+                  - /url: /register/mentor
+              - listitem [ref=f84e131]:
+                - link "Log in" [ref=f84e132] [cursor=pointer]:
+                  - /url: /login
+          - navigation [ref=f84e133]:
+            - heading "Conferences & Events" [level=2] [ref=f84e134]
+            - list [ref=f84e135]:
+              - listitem [ref=f84e136]:
+                - link "DTISB-2027" [ref=f84e137] [cursor=pointer]:
+                  - /url: /conferences/DTISB-2027
+              - listitem [ref=f84e138]:
+                - link "All conferences" [ref=f84e139] [cursor=pointer]:
+                  - /url: /conference
+              - listitem [ref=f84e140]:
+                - link "Seminars" [ref=f84e141] [cursor=pointer]:
+                  - /url: /seminar
+              - listitem [ref=f84e142]:
+                - link "News" [ref=f84e143] [cursor=pointer]:
+                  - /url: /news
+          - navigation [ref=f84e144]:
+            - heading "Services" [level=2] [ref=f84e145]
+            - list [ref=f84e146]:
+              - listitem [ref=f84e147]:
+                - link "Academic modification" [ref=f84e148] [cursor=pointer]:
+                  - /url: /academic-modification
+              - listitem [ref=f84e149]:
+                - link "Poster presentation" [ref=f84e150] [cursor=pointer]:
+                  - /url: /poster
+              - listitem [ref=f84e151]:
+                - link "Training" [ref=f84e152] [cursor=pointer]:
+                  - /url: /eLearning
+              - listitem [ref=f84e153]:
+                - link "Publication" [ref=f84e154] [cursor=pointer]:
+                  - /url: /publication
+        - generic [ref=f84e155]:
+          - heading "Contact" [level=2] [ref=f84e156]
+          - generic [ref=f84e157]:
+            - paragraph [ref=f84e158]:
+              - generic [ref=f84e162]:
+                - generic [ref=f84e163]: 153 Dunstall Avenue
+                - generic [ref=f84e164]: Wolverhampton, West Midlands
+                - generic [ref=f84e165]: WV6 0NG, United Kingdom
+            - paragraph [ref=f84e166]:
+              - link "+44 (0) 7825 310407" [ref=f84e169] [cursor=pointer]:
+                - /url: tel:+447825310407
+            - paragraph [ref=f84e170]:
+              - link "info@ritechs.org" [ref=f84e174] [cursor=pointer]:
+                - /url: mailto:info@ritechs.org
+      - generic [ref=f84e175]:
+        - paragraph [ref=f84e176]: © 2026 RiTECHS. All rights reserved.
+        - list [ref=f84e177]:
+          - listitem [ref=f84e178]:
+            - link "Privacy Policy" [ref=f84e179] [cursor=pointer]:
+              - /url: /privacy
+  - button "Open Next.js Dev Tools" [ref=f84e185] [cursor=pointer]
+  - alert [ref=f84e189]

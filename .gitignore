@@ -1,0 +1,68 @@
+# ── Dependencies & build output ─────────────────────────────
+node_modules/
+dist/
+dist-check/
+.next/
+out/
+build/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+.claude/
+# ── Secrets & local configuration (commit only the *.example files) ──
+.env
+.env.*
+!.env.example
+!**/.env.example
+!deploy/.env.production.example
+*.pem
+*.key
+
+# ── Local data ──────────────────────────────────────────────
+uploads/
+.data/
+public/legacy/
+# Database exports: real user data and password hashes — never commit them, in any folder.
+# Only the schema migrations and the roles script are allowed.
+*.sql
+*.sql.gz
+*.sql.zip
+*.dump
+*.backup
+*.bak
+ritechs_db*
+information_schema*
+*localhost*.sql
+!packages/db/migrations/*.sql
+!packages/db/sql/roles.sql
+
+# ── AI assistant & design-tooling files (local only) ────────
+.claude/
+.mcp.json
+skills-lock.json
+CLAUDE.md
+AGENTS.md
+**/AGENTS.md
+apps/web/AUDIT.md
+
+# ── Visual QA (local only) ──────────────────────────────────
+qa-output/
+apps/web/scripts/qa.mjs
+
+# ── Logs, OS and editor files ───────────────────────────────
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+.vercel
+.turbo
+
+# ── Deployment (local only) ─────────────────────────────────
+# .env.render / .env.vercel hold production secrets (already covered by .env.* above).
+.r2-legacy/
+.tmp-transfer/
+.dev.md5

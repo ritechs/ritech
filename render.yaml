@@ -1,0 +1,53 @@
+# Render Blueprint for the RiTECHS API (NestJS). In Render: New → Blueprint → pick this repo.
+# The website runs on Vercel (apps/web/vercel.json); the database is Neon; files are on Cloudflare R2.
+# Secret values (sync: false) are asked for when the Blueprint is created; see DEPLOY.md.
+services:
+  - type: web
+    name: ritechs-api
+    runtime: docker
+    dockerfilePath: ./apps/api/Dockerfile
+    dockerContext: .
+    region: singapore            # closest Render region to Bangladesh; put Neon in Singapore too
+    plan: free                   # $0. Sleeps after 15 min idle (see DEPLOY.md "Free plan"). Change to "starter" ($7/month) for always-on + SMTP.
+    healthCheckPath: /api/health # liveness only: does not touch (or wake) the database
+    # preDeployCommand (automatic migrations) is not available on the free plan: run `npm run db:migrate` from your PC, see DEPLOY.md.
+    # On the Starter plan add:  preDeployCommand: node /app/packages/db/dist/migrate.js
+    autoDeploy: true
+    buildFilter:
+      paths: [apps/api/**, packages/**, package.json, package-lock.json, render.yaml]
+    envVars:
+      - { key: NODE_ENV, value: production }
+      - { key: PORT, value: "4000" }
+      - { key: LOG_LEVEL, value: info }
+      # Database (Neon, direct connection string, not the "-pooler" one)
+      - { key: DATABASE_URL, sync: false }
+      - { key: DATABASE_SSL, value: "true" }
+      - { key: DATABASE_POOL_MAX, value: "5" }
+      - { key: DB_SCALE_TO_ZERO, value: "true" }  # lets Neon pause when nobody is using the site
+      # The website on Vercel, e.g. https://ritechs.vercel.app (no trailing slash)
+      - { key: WEB_URL, sync: false }
+      - { key: WEB_REVALIDATE_URL, sync: false }   # <WEB_URL>/internal/revalidate
+      # Secrets: same values in Vercel where noted (see DEPLOY.md)
+      - { key: BETTER_AUTH_SECRET, sync: false }
+      - { key: INTERNAL_API_TOKEN, sync: false }   # also in Vercel
+      - { key: REVALIDATE_SECRET, sync: false }    # also in Vercel
+      - { key: EDGE_PROXY_SECRET, sync: false }    # also in Vercel
+      # Visitors reach the API only through the website, which sends their IP with EDGE_PROXY_SECRET.
+      - { key: TRUSTED_PROXIES, value: "" }
+      - { key: WORKER_IN_PROCESS, value: "true" }
+      - { key: REQUIRE_STAFF_2FA, value: "false" }
+      - { key: PASSWORD_BREACH_CHECK, value: "true" }
+      # Email (cPanel mailbox)
+      - { key: RESEND_API_KEY, sync: false }       # free plan blocks SMTP; Resend sends over HTTPS. MAIL_FROM must use a domain verified in Resend
+      - { key: SMTP_URL, sync: false }             # only used on paid plans (no RESEND_API_KEY)
+      - { key: MAIL_FROM, value: "RiTECHS <no-reply@ritechs.org>" }
+      - { key: SECURITY_ALERT_EMAIL, value: info@ritechs.org }
+      # Files: Cloudflare R2
+      - { key: STORAGE_DRIVER, value: s3 }
+      - { key: S3_REGION, value: auto }
+      - { key: S3_ENDPOINT, sync: false }          # https://<account-id>.r2.cloudflarestorage.com
+      - { key: S3_BUCKET, sync: false }
+      - { key: S3_ACCESS_KEY_ID, sync: false }
+      - { key: S3_SECRET_ACCESS_KEY, sync: false }
+      - { key: MEDIA_PUBLIC_URL, sync: false }     # https://media.ritechs.org (the bucket's public domain)
+      - { key: LEGACY_ASSET_BASE, sync: false }    # https://ritechs.org now; https://media.ritechs.org/legacy after copying old files

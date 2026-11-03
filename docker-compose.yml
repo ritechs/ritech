@@ -1,0 +1,121 @@
+# Production on one server (comfortably handles tens of thousands of visitors a day).
+#
+#   cp deploy/.env.production.example .env   # fill in every value
+#   docker compose up -d --build
+#   docker compose run --rm api node dist/cli/create-admin.js --email you@ritechs.org --name "Your Name"
+#
+# Only Caddy is reachable from the internet (ports 80/443, automatic HTTPS).
+# The API and Postgres sit on a private network with no published ports.
+name: ritechs
+
+x-api-env: &api-env
+  NODE_ENV: production
+  DATABASE_URL: postgres://ritechs_app:${DB_APP_PASSWORD}@postgres:5432/ritechs
+  WEB_URL: https://${DOMAIN}
+  BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+  INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+  # Caddy and the web container: the only hops whose X-Forwarded-For we believe.
+  TRUSTED_PROXIES: 172.28.0.0/24
+  SMTP_URL: ${SMTP_URL}
+  MAIL_FROM: ${MAIL_FROM:-RiTECHS <no-reply@ritechs.org>}
+  SECURITY_ALERT_EMAIL: ${SECURITY_ALERT_EMAIL:-}
+  TURNSTILE_SECRET_KEY: ${TURNSTILE_SECRET_KEY:-}
+  STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+  S3_ENDPOINT: ${S3_ENDPOINT:-}
+  S3_BUCKET: ${S3_BUCKET:-}
+  S3_ACCESS_KEY_ID: ${S3_ACCESS_KEY_ID:-}
+  S3_SECRET_ACCESS_KEY: ${S3_SECRET_ACCESS_KEY:-}
+  MEDIA_PUBLIC_URL: ${MEDIA_PUBLIC_URL:-}
+  WEB_REVALIDATE_URL: http://web:3000/internal/revalidate
+  REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+  LOG_LEVEL: info
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ritechs
+      POSTGRES_USER: ritechs_owner
+      POSTGRES_PASSWORD: ${DB_OWNER_PASSWORD}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD}
+    command: ["postgres", "-c", "max_connections=100", "-c", "shared_buffers=256MB", "-c", "log_min_duration_statement=500", "-c", "password_encryption=scram-sha-256"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/postgres-init.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    networks: [private]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ritechs_owner -d ritechs"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  # One-shot: applies migrations as the schema owner, then exits.
+  migrate:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    command: ["node", "../../packages/db/dist/migrate.js"]
+    environment:
+      MIGRATION_DATABASE_URL: postgres://ritechs_owner:${DB_OWNER_PASSWORD}@postgres:5432/ritechs
+    depends_on: { postgres: { condition: service_healthy } }
+    networks: [private]
+    restart: "no"
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    restart: unless-stopped
+    environment:
+      <<: *api-env
+      WORKER_IN_PROCESS: "true"
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres: { condition: service_healthy }
+      migrate: { condition: service_completed_successfully }
+    networks: [private]
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    deploy: { resources: { limits: { memory: 768M } } }
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+      args:
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${TURNSTILE_SITE_KEY:-}
+    restart: unless-stopped
+    environment:
+      API_INTERNAL_URL: http://api:4000
+      INTERNAL_API_TOKEN: ${INTERNAL_API_TOKEN}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+    depends_on: [api]
+    networks: [private]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    deploy: { resources: { limits: { memory: 768M } } }
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports: ["80:80", "443:443", "443:443/udp"]
+    environment:
+      DOMAIN: ${DOMAIN}
+      ACME_EMAIL: ${ACME_EMAIL}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on: [web]
+    networks: [private]
+
+networks:
+  private:
+    ipam:
+      config: [{ subnet: 172.28.0.0/24 }]
+
+volumes:
+  pgdata:
+  uploads:
+  caddy_data:
+  caddy_config:

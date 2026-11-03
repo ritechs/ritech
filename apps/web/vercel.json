@@ -1,0 +1,8 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "installCommand": "cd ../.. && npm ci",
+  "buildCommand": "cd ../.. && npm run build -w @ritechs/shared && npm run build -w @ritechs/web",
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ../../packages/shared ../../package-lock.json",
+  "regions": ["sin1"]
+}

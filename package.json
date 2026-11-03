@@ -1,0 +1,31 @@
+{
+  "name": "ritechs",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "build": "npm run build -w @ritechs/shared -w @ritechs/db && npm run build -w @ritechs/api && npm run build -w @ritechs/web",
+    "build:packages": "npm run build -w @ritechs/shared -w @ritechs/db",
+    "dev:web": "npm run dev -w @ritechs/web",
+    "dev:api": "npm run dev -w @ritechs/api",
+    "dev:worker": "npm run dev:worker -w @ritechs/api",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test -w @ritechs/api",
+    "db:generate": "npm run generate -w @ritechs/db",
+    "db:migrate": "npm run migrate -w @ritechs/db",
+    "db:seed": "npm run seed -w @ritechs/db",
+    "admin:create": "npm run admin:create -w @ritechs/api --",
+    "2fa:off": "npm run 2fa:off -w @ritechs/api --",
+    "services:up": "docker compose -f docker-compose.dev.yml up -d",
+    "start:api": "npm run start -w @ritechs/api",
+    "start:web": "npm run start -w @ritechs/web"
+  }
+}
