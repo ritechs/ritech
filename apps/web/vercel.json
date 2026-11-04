@@ -3,6 +3,6 @@
   "framework": "nextjs",
   "installCommand": "cd ../.. && npm ci",
   "buildCommand": "cd ../.. && npm run build -w @ritechs/shared && npm run build -w @ritechs/web",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ../../packages/shared ../../package-lock.json",
+  "ignoreCommand": "git rev-parse --verify --quiet HEAD^ >/dev/null || exit 1; git diff --quiet HEAD^ HEAD -- . ../../packages/shared ../../package-lock.json",
   "regions": ["sin1"]
 }
