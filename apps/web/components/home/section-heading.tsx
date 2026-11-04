@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/** Section opener: serif heading, optional description, optional trailing link. */
+/**
+ * Home-page section opener: a small hatched mark, then a condensed uppercase
+ * heading (Oswald), optional description and an optional trailing link.
+ */
 export function SectionHeading({
   id,
   title,
@@ -10,6 +12,7 @@ export function SectionHeading({
   action,
   className,
   inverse = false,
+  align = "start",
 }: {
   id: string;
   title: string;
@@ -17,24 +20,42 @@ export function SectionHeading({
   action?: { label: string; href: string };
   className?: string;
   inverse?: boolean;
+  align?: "start" | "center";
 }) {
+  const center = align === "center";
   return (
-    <div className={cn("flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-10", className)}>
-      <div className="max-w-2xl">
-        <h2 id={id} className={cn("font-serif text-h2 font-normal [text-wrap:balance]", inverse ? "text-white" : "text-ink")}>
+    <div
+      className={cn(
+        "flex flex-col gap-5",
+        center ? "items-center text-center" : "md:flex-row md:items-end md:justify-between md:gap-10",
+        className,
+      )}
+    >
+      <div className={cn("max-w-2xl", center && "flex flex-col items-center")}>
+        <span aria-hidden className={cn("hatch-mark mb-3.5", inverse ? "text-highlight" : "text-brand")} />
+        <h2
+          id={id}
+          className={cn(
+            "font-headline text-[clamp(2rem,1.4rem+2.4vw,2.875rem)] leading-[1.08] font-semibold tracking-[0.01em] uppercase [text-wrap:balance]",
+            inverse ? "text-white" : "text-brand",
+          )}
+        >
           {title}
         </h2>
         {description && (
-          <p className={cn("mt-3 text-[1.0625rem] leading-relaxed", inverse ? "text-white/75" : "text-muted-ink")}>{description}</p>
+          <p className={cn("mt-3 text-[1.0625rem] leading-relaxed", inverse ? "text-white/80" : "text-muted-ink")}>{description}</p>
         )}
       </div>
       {action && (
         <Link
           href={action.href}
-          className="group tap-target inline-flex shrink-0 items-center gap-1.5 self-start rounded-sm text-[0.9375rem] font-medium text-brand hover:text-brand-strong md:self-auto"
+          className={cn(
+            "tap-target shrink-0 self-start rounded-sm border-b-2 pb-0.5 text-[0.9375rem] font-semibold transition-colors md:self-auto",
+            inverse ? "border-highlight/60 text-white hover:border-highlight" : "border-brand-tint text-brand hover:border-brand",
+            center && "md:self-center",
+          )}
         >
-          {action.label}
-          <ArrowRight className="size-4 transition-transform duration-150 group-hover:translate-x-0.5" aria-hidden />
+          {action.label} »
         </Link>
       )}
     </div>

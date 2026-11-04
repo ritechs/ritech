@@ -1,3 +1,5 @@
+import { Reveal } from "@/components/home/reveal";
+import { SectionHeading } from "@/components/home/section-heading";
 import { LegacyImage } from "@/components/media/legacy-image";
 import { getPartners } from "@/lib/server/content";
 
@@ -8,15 +10,16 @@ import { getPartners } from "@/lib/server/content";
 export async function PartnersSection() {
   const partners = await getPartners();
   return (
-    <section aria-labelledby="partners-heading" className="border-t border-rule bg-surface py-14 md:py-16">
-      <div className="container-site grid gap-8 lg:grid-cols-12 lg:items-center lg:gap-10">
-        <div className="lg:col-span-3">
-          <h2 id="partners-heading" className="font-serif text-h3 font-normal text-ink">
-            Institutional Partners
-          </h2>
-          <p className="mt-2 text-[0.9375rem] text-muted-ink">Universities, publishers and organisations RiTECHS has worked with.</p>
-        </div>
-        <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-lg border border-rule bg-rule sm:grid-cols-3 md:grid-cols-4 lg:col-span-9 xl:grid-cols-5">
+    <section aria-labelledby="partners-heading" className="border-t border-rule bg-surface py-16 md:py-20">
+      <div className="container-site">
+        <SectionHeading
+          id="partners-heading"
+          title="Institutional Partners"
+          description="Universities, publishers and organisations RiTECHS has worked with."
+          align="center"
+        />
+        <Reveal fade as="div" className="mt-10">
+        <ul className="grid grid-cols-2 gap-px overflow-hidden border border-rule bg-rule sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5">
           {partners.map((p) => (
             <li key={p.name} className="flex min-h-28 flex-col items-center justify-center gap-3 bg-surface px-4 py-6 text-center">
               <a
@@ -42,6 +45,7 @@ export async function PartnersSection() {
             </li>
           ))}
         </ul>
+        </Reveal>
       </div>
     </section>
   );

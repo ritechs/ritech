@@ -13,6 +13,7 @@ import "./globals.css";
  *  - Newsreader: editorial serif for headings, article titles, abstracts
  *  - IBM Plex Sans: interface text and metadata
  *  - IBM Plex Mono: identifiers only (DOI, ISSN)
+ *  - Oswald: condensed uppercase headings on the home page
  */
 const newsreader = localFont({
   src: [
@@ -30,6 +31,16 @@ const plexSans = localFont({
     { path: "./fonts/ibm-plex-sans-latin-600-normal.woff2", weight: "600", style: "normal" },
   ],
   variable: "--font-plex-sans",
+  display: "swap",
+});
+
+const oswald = localFont({
+  src: [
+    { path: "./fonts/oswald-latin-500-normal.woff2", weight: "500", style: "normal" },
+    { path: "./fonts/oswald-latin-600-normal.woff2", weight: "600", style: "normal" },
+    { path: "./fonts/oswald-latin-700-normal.woff2", weight: "700", style: "normal" },
+  ],
+  variable: "--font-oswald",
   display: "swap",
 });
 
@@ -80,7 +91,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={`${newsreader.variable} ${plexSans.variable} ${plexMono.variable} antialiased`}
+      className={`${newsreader.variable} ${plexSans.variable} ${plexMono.variable} ${oswald.variable} antialiased`}
     >
       <body className="flex min-h-dvh flex-col">
         <a

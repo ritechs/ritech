@@ -16,6 +16,8 @@ const buttonVariants = cva(
         outline: "border border-brand/35 bg-surface text-brand hover:border-brand hover:bg-brand-wash",
         inverse: "bg-white text-brand hover:bg-brand-wash",
         "outline-inverse": "border border-white/35 text-white hover:border-white/70 hover:bg-white/5",
+        /** Amber call to action, used on dark bands of the home page. */
+        highlight: "bg-highlight text-on-highlight hover:brightness-105 active:brightness-95 focus-visible:outline-white",
         ghost: "text-ink hover:bg-ink/5",
         link: "h-auto rounded-sm px-0 text-brand underline decoration-brand/30 underline-offset-4 hover:decoration-brand",
       },

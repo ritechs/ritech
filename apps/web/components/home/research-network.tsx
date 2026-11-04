@@ -7,7 +7,7 @@ import { siteConfig } from "@/lib/site";
 
 /**
  * Hero visual: the six research areas as a collaboration network on a
- * burgundy panel carrying the RiTECHS logo. Lines draw once on load;
+ * brand-coloured panel carrying the RiTECHS logo. Lines draw once on load;
  * static when reduced motion is preferred.
  */
 type Pt = { x: number; y: number; anchor: "start" | "middle" | "end"; dx: number; dy: number };
@@ -51,8 +51,8 @@ export function ResearchNetwork() {
 
   return (
     <figure className="relative mx-auto w-full max-w-[30rem] lg:mr-0">
-      <div aria-hidden className="absolute inset-0 translate-x-3 translate-y-3 rounded-lg bg-brand-wash sm:translate-x-4 sm:translate-y-4" />
-      <div className="relative overflow-hidden rounded-lg bg-brand text-white shadow-[0_30px_60px_-36px_rgba(81,23,45,0.8)]">
+      <div aria-hidden className="absolute inset-0 translate-x-3 translate-y-3 rounded-lg bg-highlight/80 sm:translate-x-4 sm:translate-y-4" />
+      <div className="relative overflow-hidden rounded-lg bg-brand text-white shadow-[0_30px_60px_-36px_color-mix(in_srgb,var(--brand-darkest)_80%,transparent)]">
         <div className="flex items-center justify-between gap-6 border-b border-white/15 px-6 py-5 sm:px-7">
           <Image
             src={siteConfig.logo.onDark}
@@ -78,8 +78,8 @@ export function ResearchNetwork() {
             </pattern>
           </defs>
           <rect width="340" height="310" fill="url(#net-grid)" />
-          <circle cx={HUB.x} cy={HUB.y} r="112" fill="none" stroke="rgba(232,198,208,0.22)" strokeDasharray="2 6" />
-          <circle cx={HUB.x} cy={HUB.y} r="58" fill="none" stroke="rgba(232,198,208,0.16)" />
+          <circle cx={HUB.x} cy={HUB.y} r="112" fill="none" stroke="color-mix(in srgb, var(--brand-tint) 22%, transparent)" strokeDasharray="2 6" />
+          <circle cx={HUB.x} cy={HUB.y} r="58" fill="none" stroke="color-mix(in srgb, var(--brand-tint) 16%, transparent)" />
 
           <g strokeLinecap="round" fill="none">
             {links.map(([a, b], i) => (
@@ -89,7 +89,7 @@ export function ResearchNetwork() {
                 y1={layout[a].y}
                 x2={layout[b].x}
                 y2={layout[b].y}
-                stroke="rgba(232,198,208,0.42)"
+                stroke="color-mix(in srgb, var(--brand-tint) 42%, transparent)"
                 strokeWidth={1}
                 {...draw(0.3 + i * 0.06)}
               />

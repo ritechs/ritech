@@ -4,11 +4,15 @@ import { routes } from "@/lib/site";
 
 export function NewsletterCta() {
   return (
-    <section aria-labelledby="newsletter-heading" className="bg-brand-deep text-white">
+    <section aria-labelledby="newsletter-heading" className="bg-brand-deep bg-stripes text-white">
       <div className="container-site grid gap-10 py-16 md:py-20 lg:grid-cols-12 lg:items-center lg:gap-12 lg:py-24">
         <div className="lg:col-span-6">
-          <h2 id="newsletter-heading" className="max-w-[20ch] font-serif text-h2 font-normal [text-wrap:balance]">
-            Be Part of the Next Generation of Research.
+          <span aria-hidden className="hatch-mark mb-3.5 text-highlight" />
+          <h2
+            id="newsletter-heading"
+            className="max-w-[20ch] font-headline text-[clamp(2rem,1.4rem+2.4vw,3rem)] leading-[1.06] font-semibold tracking-[0.01em] uppercase [text-wrap:balance]"
+          >
+            Be Part of the Next Generation of Research
           </h2>
           <p className="mt-4 max-w-lg text-[1.0625rem] leading-relaxed text-white/75">
             Get calls for papers, conference dates and new publications by email, about once a month. Prefer to get

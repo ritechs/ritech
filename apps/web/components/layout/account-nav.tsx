@@ -36,8 +36,8 @@ const links = (u: SessionUser) =>
         { href: `${routes.dashboard}/profile`, label: "Edit My Profile", icon: CircleUser },
       ];
 
-/** Header, wide screens: Login and Register, or the signed-in person's menu. */
-export function AccountNav() {
+/** Header, wide screens: Login and Register, or the signed-in person's menu. `overlay`: white, over the home-page hero. */
+export function AccountNav({ overlay = false }: { overlay?: boolean }) {
   const user = useSession();
   const [signingOut, doSignOut] = useSignOut();
 
@@ -47,10 +47,15 @@ export function AccountNav() {
   if (!user)
     return (
       <>
-        <Button asChild variant="ghost" size="sm" className="hidden h-10 px-3 text-[0.9375rem] text-ink sm:inline-flex">
+        <Button
+          asChild
+          variant="ghost"
+          size="sm"
+          className={cn("hidden h-10 px-3 text-[0.9375rem] sm:inline-flex", overlay ? "text-white hover:bg-white/10" : "text-ink")}
+        >
           <Link href={routes.login}>Login</Link>
         </Button>
-        <Button asChild size="sm" className="hidden h-10 px-4 text-[0.9375rem] sm:inline-flex">
+        <Button asChild size="sm" variant={overlay ? "inverse" : "default"} className="hidden h-10 px-4 text-[0.9375rem] sm:inline-flex">
           <Link href={routes.register}>Register</Link>
         </Button>
       </>
@@ -62,13 +67,19 @@ export function AccountNav() {
         <button
           type="button"
           aria-label={`Account menu for ${user.name}`}
-          className="hidden min-h-11 items-center gap-2 rounded-full py-1 pr-2.5 pl-1 text-left transition-colors hover:bg-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand sm:inline-flex"
+          className={cn(
+            "hidden min-h-11 items-center gap-2 rounded-full py-1 pr-2.5 pl-1 text-left transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 sm:inline-flex",
+            overlay ? "hover:bg-white/10 focus-visible:outline-white" : "hover:bg-paper focus-visible:outline-brand",
+          )}
         >
-          <span aria-hidden className="inline-flex size-9 items-center justify-center rounded-full bg-brand text-sm font-medium text-white">
+          <span
+            aria-hidden
+            className={cn("inline-flex size-9 items-center justify-center rounded-full text-sm font-medium", overlay ? "bg-white text-brand" : "bg-brand text-white")}
+          >
             {initials(user.name)}
           </span>
-          <span className="hidden max-w-36 truncate text-[0.9375rem] font-medium text-ink lg:block">{user.name.split(" ")[0]}</span>
-          <ChevronDown className="size-4 text-faint-ink" aria-hidden />
+          <span className={cn("hidden max-w-36 truncate text-[0.9375rem] font-medium lg:block", overlay ? "text-white" : "text-ink")}>{user.name.split(" ")[0]}</span>
+          <ChevronDown className={cn("size-4", overlay ? "text-white/75" : "text-faint-ink")} aria-hidden />
         </button>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>

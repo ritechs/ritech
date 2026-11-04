@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Hero } from "@/components/home/hero";
+import { JourneyStrip } from "@/components/home/journey-strip";
+import { Trending } from "@/components/home/trending";
+import { BuiltForResearch } from "@/components/home/built-for-research";
 import { ImpactStats } from "@/components/home/impact-stats";
 import { FeaturedResearch } from "@/components/home/featured-research";
 import { ResearchAreas } from "@/components/home/research-areas";
-import { EventsSection } from "@/components/home/events-section";
+import { EventsSection, ProgrammeTiles } from "@/components/home/events-section";
 import { HowItWorks } from "@/components/home/how-it-works";
 import { MentorshipSection } from "@/components/home/mentorship-section";
 import { ServicesSection } from "@/components/home/services-section";
@@ -61,11 +64,16 @@ export default async function HomePage() {
   return (
     <main id="main" className="flex-1">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      {/* Layout in the style of usf.edu: full-width hero, journey strip, highlight cards, dark band, numbers. */}
       <Hero />
+      <JourneyStrip />
+      <Trending />
+      <BuiltForResearch />
       <ImpactStats />
-      <FeaturedResearch />
       <ResearchAreas />
+      <FeaturedResearch />
       <EventsSection />
+      <ProgrammeTiles />
       <HowItWorks />
       <MentorshipSection />
       <ServicesSection />

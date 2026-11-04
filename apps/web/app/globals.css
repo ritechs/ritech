@@ -4,20 +4,31 @@
 /*
  * RiTECHS design tokens
  * ---------------------------------------------------------------
- * Burgundy (#6f263d) is the institutional colour: primary actions,
- * links, focus and one burgundy band per page. Charcoal text on white,
- * with warm off-white (#f7f6f5) for secondary sections.
- * Shadcn/ui semantic tokens are mapped onto the same palette so
- * generated components inherit the RiTECHS identity automatically.
+ * Change the site's colours HERE: every page, button, link and band reads
+ * these variables (and Tailwind classes such as bg-brand map onto them).
+ *
+ * Palette: Midnight Navy + Amber.
+ *   --brand        main colour: buttons, links, focus, headings on the home page
+ *   --brand-strong hover / pressed
+ *   --brand-deep   dark bands (newsletter, "Built for your research")
+ *   --brand-darkest deepest shade, hero gradient and footer
+ *   --brand-wash / --brand-tint  light backgrounds and borders
+ *   --highlight    accent for call-to-action buttons; --on-highlight is its text
+ *   --sand         warm light band behind the numbers on the home page
+ * Shadcn/ui semantic tokens are mapped onto the same palette below.
  */
 :root {
-  /* Brand: RiTECHS maroon (#6f263d) with deeper and lighter steps */
-  --brand: #6f263d;
-  --brand-strong: #5a1d31; /* hover / pressed */
-  --brand-deep: #51172d; /* deep burgundy: pressed states, CTA band */
-  --brand-wash: #f6edf0; /* tinted backgrounds, selected states */
-  --brand-tint: #e8d4da; /* borders on tinted surfaces */
-  --chart-1: #9c3a58; /* chart series 1 (validated pair with --chart-2: CVD ΔE 22) */
+  /* Brand: Midnight Navy (#1b3a6b) with deeper and lighter steps */
+  --brand: #1b3a6b;
+  --brand-strong: #152f57; /* hover / pressed */
+  --brand-deep: #11264a; /* dark bands, pressed states */
+  --brand-darkest: #0a1730; /* hero gradient, footer */
+  --brand-wash: #eef2f8; /* tinted backgrounds, selected states */
+  --brand-tint: #d3dcea; /* borders on tinted surfaces */
+  --highlight: #f2b134; /* amber accent: call-to-action buttons, small marks on dark bands */
+  --on-highlight: #3b2704; /* text on the amber accent (9:1) */
+  --sand: #f4efe6; /* warm band behind the home-page numbers */
+  --chart-1: #2c538f; /* chart series 1 */
   --chart-2: #d08a3a; /* chart series 2; below 3:1 on white, so charts carry labels or a table */
 
   /* Neutrals: warm greys that sit comfortably beside maroon */
@@ -68,6 +79,10 @@
   --color-brand-deep: var(--brand-deep);
   --color-brand-wash: var(--brand-wash);
   --color-brand-tint: var(--brand-tint);
+  --color-brand-darkest: var(--brand-darkest);
+  --color-highlight: var(--highlight);
+  --color-on-highlight: var(--on-highlight);
+  --color-sand: var(--sand);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-rule: var(--rule);
@@ -106,6 +121,8 @@
   --font-serif: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
   --font-sans: var(--font-plex-sans), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+  /* Condensed uppercase headings on the home page (Oswald) */
+  --font-headline: var(--font-oswald), "Arial Narrow", sans-serif;
 
   /* Type scale: ratio ~1.25 from a 16px base, display sizes fluid */
   --text-display: clamp(2.375rem, 1.6rem + 3.2vw, 4.25rem);
@@ -168,7 +185,7 @@
     accent-color: var(--brand);
     caret-color: var(--brand);
     scrollbar-color: var(--rule-strong) transparent;
-    -webkit-tap-highlight-color: rgb(111 38 61 / 0.12);
+    -webkit-tap-highlight-color: color-mix(in srgb, var(--brand) 12%, transparent);
   }
   a,
   button,
@@ -217,5 +234,67 @@
   min-height: 2.75rem;
   @media (width >= 48rem) and (pointer: fine) {
     min-height: 1.5rem;
+  }
+}
+
+/* ── Home page (university-portal style) ───────────────────────────── */
+
+/* Small hatched mark above section headings */
+@utility hatch-mark {
+  display: block;
+  width: 2.875rem;
+  height: 0.5625rem;
+  background: repeating-linear-gradient(115deg, currentColor 0 2px, transparent 2px 6px);
+}
+
+/* Fine diagonal weave for dark bands */
+@utility bg-weave {
+  background-image:
+    repeating-linear-gradient(45deg, rgb(255 255 255 / 0.035) 0 2px, transparent 2px 22px),
+    repeating-linear-gradient(-45deg, rgb(255 255 255 / 0.035) 0 2px, transparent 2px 22px);
+}
+
+/* Broad diagonal stripes for the "Start your journey" strip and the newsletter band */
+@utility bg-stripes {
+  background-image: repeating-linear-gradient(115deg, rgb(255 255 255 / 0.05) 0 14px, transparent 14px 34px);
+}
+
+/*
+ * Angled section edges. A band with clip-angle-bottom followed by a section
+ * with clip-angle-follow and a -3.5vw top margin meet along one straight line.
+ */
+@utility clip-angle-bottom {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 calc(100% - 3.5vw));
+}
+@utility clip-angle-follow {
+  clip-path: polygon(0 0, 100% 3.5vw, 100% calc(100% - 3.5vw), 0 100%);
+}
+
+/*
+ * Scroll reveal, as on usf.edu: items slide up and fade in when they enter
+ * the viewport, staggered within a row (see components/home/reveal.tsx).
+ * Only when JavaScript runs (@media scripting) and the visitor has not asked
+ * for reduced motion, so content is never hidden otherwise. Browsers that do
+ * not know the scripting media feature simply show everything.
+ */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(4.5rem);
+    transition:
+      transform 0.75s cubic-bezier(0.2, 0.7, 0.2, 1),
+      opacity 0.5s ease-out;
+  }
+  [data-reveal="fade"] {
+    transform: none;
+  }
+  [data-reveal][data-shown] {
+    opacity: 1;
+    transform: none;
+  }
+  @media (width >= 48rem) {
+    [data-reveal] {
+      transition-delay: calc(var(--reveal-i, 0) * 0.15s);
+    }
   }
 }
