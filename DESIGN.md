@@ -4,15 +4,15 @@ name: RiTECHS
 description: The design system of RiTECHS (Research, Innovation, Technology & Solution), an academic research, publication and mentoring organisation. A burgundy-and-white institutional identity built around the supplied RiTECHS logo — deep burgundy for action and emphasis, charcoal text on white, a warm off-white for secondary sections — set in an editorial serif (Newsreader) for headings, titles and abstracts and IBM Plex Sans for interface text. Restrained borders, soft offset shadows, generous whitespace; one burgundy band per page.
 
 colors:
-  brand: "#1b3a6b"
-  brand-strong: "#152f57"
-  brand-deep: "#11264a"
-  brand-darkest: "#0a1730"
-  brand-wash: "#eef2f8"
-  brand-tint: "#d3dcea"
-  highlight: "#f2b134"
-  on-highlight: "#3b2704"
-  sand: "#f4efe6"
+  brand: "#33404f"
+  brand-strong: "#2b3643"
+  brand-deep: "#1f2933"
+  brand-darkest: "#12181e"
+  brand-wash: "#eff0f2"
+  brand-tint: "#d2d5d9"
+  highlight: "#ff8a3d"
+  on-highlight: "#3b1700"
+  sand: "#f1efec"
   ink: "#202124"
   ink-soft: "#3c4043"
   muted-ink: "#55595e"
@@ -171,12 +171,12 @@ landing page. Two surface modes apply:
   precise details, not decoration.
 
 The supplied logo (`public/brand/ritechs-logo-white.png`, white on transparent) is the identity.
-On light surfaces use the burgundy recolour of the same artwork (`ritechs-logo.png`). Never stretch,
+On light surfaces use the brand-colour (slate) recolour of the same artwork (`ritechs-logo-slate.png`). Never stretch,
 re-draw, add effects to, or substitute the logo.
 
 ## Colors
 
-> **Palette changed to Midnight Navy + Amber (test project, November 2026).** All colours are
+> **Palette changed to Slate + Orange (test project, November 2026).** All colours are
 > CSS variables at the top of `apps/web/app/globals.css`; change them there and the whole site
 > follows. The burgundy notes below describe the previous palette; read "burgundy" as "brand".
 > The home page now uses a university-portal layout (condensed Oswald headings, angled bands,

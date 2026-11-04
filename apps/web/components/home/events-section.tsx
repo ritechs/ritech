@@ -112,7 +112,7 @@ export async function EventsSection() {
 
 /** Seminars, boot camps and other programmes as tall tiles, like the video row on usf.edu. */
 export function ProgrammeTiles() {
-  const shades = ["bg-brand", "bg-ink", "bg-brand-strong", "bg-brand-deep"];
+  const shades = ["bg-brand", "bg-brand-deep", "bg-brand-mid", "bg-brand-darkest"];
   return (
     <section aria-labelledby="programmes-heading" className="relative overflow-hidden bg-paper py-16 md:py-20 lg:py-24">
       <div aria-hidden className="absolute -top-24 -left-40 size-[34rem] rounded-full border-[4rem] border-brand/[0.05]" />

@@ -38,7 +38,7 @@ export async function Trending() {
             <Reveal as="li" key={c.href} index={i}>
               <Link
                 href={c.href}
-                className="group flex h-full flex-col bg-brand text-white shadow-[0_10px_24px_-12px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:-translate-y-1"
+                className={`group flex h-full flex-col text-white shadow-[0_10px_24px_-12px_rgb(0_0_0/0.45)] transition-transform duration-300 hover:-translate-y-1 ${["bg-brand", "bg-brand-mid", "bg-brand-light"][i % 3]}`}
               >
                 <span className="relative block aspect-[4/3] overflow-hidden">
                   <Image

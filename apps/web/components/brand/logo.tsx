@@ -5,8 +5,8 @@ import { cn } from "@/lib/utils";
 
 /**
  * The supplied RiTECHS logo. The original white artwork is used on
- * burgundy surfaces; a burgundy recolour of the same artwork (identical
- * shapes and proportions) is used on light surfaces.
+ * dark surfaces; a recolour of the same artwork in the brand colour
+ * (identical shapes and proportions) is used on light surfaces.
  */
 export function Logo({
   tone = "brand",

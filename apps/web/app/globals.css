@@ -7,31 +7,34 @@
  * Change the site's colours HERE: every page, button, link and band reads
  * these variables (and Tailwind classes such as bg-brand map onto them).
  *
- * Palette: Midnight Navy + Amber.
+ * Palette: Slate + Orange.
  *   --brand        main colour: buttons, links, focus, headings on the home page
  *   --brand-strong hover / pressed
+ *   --brand-mid / --brand-light  lighter slate steps (home-page cards and tiles)
  *   --brand-deep   dark bands (newsletter, "Built for your research")
- *   --brand-darkest deepest shade, hero gradient and footer
+ *   --brand-darkest deepest shade: hero gradient and footer
  *   --brand-wash / --brand-tint  light backgrounds and borders
- *   --highlight    accent for call-to-action buttons; --on-highlight is its text
- *   --sand         warm light band behind the numbers on the home page
+ *   --highlight    orange accent for call-to-action buttons; --on-highlight is its text
+ *   --sand         light band behind the numbers on the home page
  * Shadcn/ui semantic tokens are mapped onto the same palette below.
  */
 :root {
-  /* Brand: Midnight Navy (#1b3a6b) with deeper and lighter steps */
-  --brand: #1b3a6b;
-  --brand-strong: #152f57; /* hover / pressed */
-  --brand-deep: #11264a; /* dark bands, pressed states */
-  --brand-darkest: #0a1730; /* hero gradient, footer */
-  --brand-wash: #eef2f8; /* tinted backgrounds, selected states */
-  --brand-tint: #d3dcea; /* borders on tinted surfaces */
-  --highlight: #f2b134; /* amber accent: call-to-action buttons, small marks on dark bands */
-  --on-highlight: #3b2704; /* text on the amber accent (9:1) */
-  --sand: #f4efe6; /* warm band behind the home-page numbers */
-  --chart-1: #2c538f; /* chart series 1 */
+  /* Brand: Slate (#33404f) with deeper and lighter steps */
+  --brand: #33404f;
+  --brand-strong: #2b3643; /* hover / pressed */
+  --brand-mid: #4a5a6c; /* second card shade */
+  --brand-light: #5f7185; /* third card shade */
+  --brand-deep: #1f2933; /* dark bands, pressed states */
+  --brand-darkest: #12181e; /* hero gradient, footer */
+  --brand-wash: #eff0f1; /* tinted backgrounds, selected states */
+  --brand-tint: #d2d5d8; /* borders on tinted surfaces */
+  --highlight: #ff8a3d; /* orange accent: call-to-action buttons, small marks on dark bands */
+  --on-highlight: #3b1700; /* text on the orange accent (7.5:1) */
+  --sand: #f1efec; /* light band behind the home-page numbers */
+  --chart-1: #4a5a6c; /* chart series 1 */
   --chart-2: #d08a3a; /* chart series 2; below 3:1 on white, so charts carry labels or a table */
 
-  /* Neutrals: warm greys that sit comfortably beside maroon */
+  /* Neutrals: greys for text, borders and secondary sections */
   --ink: #202124; /* dark charcoal text */
   --ink-soft: #3c4043;
   --paper: #f7f6f5; /* secondary sections */
@@ -80,6 +83,8 @@
   --color-brand-wash: var(--brand-wash);
   --color-brand-tint: var(--brand-tint);
   --color-brand-darkest: var(--brand-darkest);
+  --color-brand-mid: var(--brand-mid);
+  --color-brand-light: var(--brand-light);
   --color-highlight: var(--highlight);
   --color-on-highlight: var(--on-highlight);
   --color-sand: var(--sand);

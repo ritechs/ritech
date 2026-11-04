@@ -10,9 +10,9 @@ export const siteConfig = {
   description:
     "RiTECHS connects researchers, scholars and innovators through publications, international conferences, mentorship and research training.",
   logo: {
-    /** Burgundy recolour of the supplied white logo, for light backgrounds. */
-    onLight: "/brand/ritechs-logo.png",
-    /** Original supplied logo (white on transparent), for burgundy backgrounds. */
+    /** Slate (brand colour) recolour of the supplied white logo, for light backgrounds. */
+    onLight: "/brand/ritechs-logo-slate.png",
+    /** Original supplied logo (white on transparent), for dark backgrounds. */
     onDark: "/brand/ritechs-logo-white.png",
     width: 302,
     height: 130,

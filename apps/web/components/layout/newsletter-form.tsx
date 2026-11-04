@@ -79,7 +79,7 @@ export function NewsletterForm() {
           aria-describedby={`${id}-hint ${id}-error`}
           className="h-12 w-full min-w-0 rounded-md sm:flex-1 border border-white/25 bg-white/[0.08] px-4 text-base text-white outline-none placeholder:text-white/50 focus-visible:border-white focus-visible:ring-2 focus-visible:ring-white/25 aria-invalid:border-[#ffb4c0]"
         />
-        <Button type="submit" variant="inverse" size="lg" disabled={pending} className="h-12">
+        <Button type="submit" variant="highlight" size="lg" disabled={pending} className="h-12">
           {pending && <Spinner />}
           {pending ? "Subscribing…" : "Subscribe"}
         </Button>
