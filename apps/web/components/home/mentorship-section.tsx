@@ -16,7 +16,7 @@ const helpsWith = [
 export async function MentorshipSection() {
   const [featuredMentors, mentors] = await Promise.all([getFeaturedMentors(), getMentors()]);
   return (
-    <section id="mentorship" aria-labelledby="mentorship-heading" className="scroll-mt-20 bg-paper py-16 md:py-20 lg:py-24">
+    <section id="mentorship" aria-labelledby="mentorship-heading" className="scroll-mt-20 bg-brand-wash py-16 md:py-20 lg:py-24">
       <div className="container-site grid gap-12 lg:grid-cols-12 lg:gap-10">
         <div className="lg:col-span-4">
           <SectionHeading

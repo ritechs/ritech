@@ -72,6 +72,19 @@
   --radius: 0.375rem;
 }
 
+/*
+ * Header over the home-page hero. The hero carries [data-hero-overlay]; while
+ * the page has one and the header is not yet scrolled ([data-scrolled] is set by
+ * the header itself), the header is transparent with white text. Pure CSS, so the
+ * very first paint is already right (no dependency on the URL during rendering).
+ *   home:            the page has a full-width hero (header floats over it)
+ *   over-hero:       elements inside the header while it sits over the hero
+ *   over-hero-self:  the header element itself while it sits over the hero
+ */
+@custom-variant home (body:has([data-hero-overlay]) &);
+@custom-variant over-hero (body:has([data-hero-overlay]) [data-site-header]:not([data-scrolled]) &);
+@custom-variant over-hero-self (body:has([data-hero-overlay]) &:not([data-scrolled]));
+
 @theme inline {
   --color-ink: var(--ink);
   --color-ink-soft: var(--ink-soft);

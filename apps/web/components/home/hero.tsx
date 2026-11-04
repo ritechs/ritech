@@ -12,7 +12,7 @@ export async function Hero() {
   const next = conf?.keyDates?.[0];
   const enter = "motion-safe:animate-in motion-safe:fade-in motion-safe:slide-in-from-bottom-6 motion-safe:duration-700 motion-safe:fill-mode-both";
   return (
-    <section aria-labelledby="hero-heading" className="relative isolate overflow-hidden text-white">
+    <section data-hero-overlay aria-labelledby="hero-heading" className="relative isolate overflow-hidden text-white">
       <HeroBackdrop />
       <div className="container-site flex min-h-[min(100svh,52rem)] flex-col items-center justify-center pt-28 pb-14 text-center md:pt-36 md:pb-20">
         <h1

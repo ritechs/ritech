@@ -11,7 +11,7 @@ export async function NewsSection() {
   const news = (await getNews()).slice(0, 4);
   if (!news.length) return null;
   return (
-    <section id="news" aria-labelledby="news-heading" className="scroll-mt-20 bg-surface py-16 md:py-20 lg:py-24">
+    <section id="news" aria-labelledby="news-heading" className="scroll-mt-20 bg-brand-wash py-16 md:py-20 lg:py-24">
       <div className="container-site">
         <SectionHeading
           id="news-heading"
@@ -22,7 +22,7 @@ export async function NewsSection() {
         <ul className="mt-10 grid gap-6 sm:grid-cols-2 lg:mt-12 lg:grid-cols-4">
           {news.map((a, i) => (
             <Reveal as="li" key={a.slug} index={i}>
-              <article className="group relative flex h-full flex-col border border-rule bg-surface transition-shadow hover:shadow-[0_14px_30px_-18px_rgb(0_0_0/0.35)]">
+              <article className="group relative flex h-full flex-col overflow-hidden rounded-lg border-t-4 border-highlight bg-surface shadow-[0_14px_30px_-16px_rgb(18_24_30/0.4)] ring-1 ring-brand/10 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_22px_40px_-18px_rgb(18_24_30/0.5)]">
                 <div className="relative aspect-[16/10] overflow-hidden bg-brand-wash">
                   <Image
                     src={a.image.src}

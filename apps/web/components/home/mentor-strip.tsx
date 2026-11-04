@@ -34,8 +34,8 @@ export function MentorStrip({ mentors }: { mentors: Mentor[] }) {
   return (
     <div>
       <div className="flex items-center justify-between gap-3">
-        <h3 className="font-serif text-2xl text-ink">
-          Popular Mentors <span className="text-faint-ink numerals-tabular">({mentors.length})</span>
+        <h3 className="font-headline text-2xl font-semibold tracking-[0.02em] text-brand uppercase">
+          Popular Mentors <span className="text-muted-ink numerals-tabular">({mentors.length})</span>
         </h3>
         <div className="flex gap-2">
           <Button variant="outline" size="icon" onClick={() => page(-1)} disabled={edge.start} aria-label="Previous mentors" aria-controls="mentor-strip">
@@ -50,10 +50,13 @@ export function MentorStrip({ mentors }: { mentors: Mentor[] }) {
         id="mentor-strip"
         ref={ref}
         aria-label="Popular mentors"
-        className="mt-5 grid snap-x snap-mandatory auto-cols-[minmax(17rem,85%)] grid-flow-col grid-rows-2 gap-4 overflow-x-auto pb-3 [scrollbar-width:thin] sm:auto-cols-[minmax(19rem,calc(50%-0.5rem))]"
+        className="-mx-2 mt-3 grid snap-x snap-mandatory scroll-px-2 auto-cols-[minmax(17rem,85%)] grid-flow-col grid-rows-2 gap-5 overflow-x-auto px-2 pt-3 pb-6 [scrollbar-width:thin] sm:auto-cols-[minmax(19rem,calc(50%-0.625rem))]"
       >
         {mentors.map((m) => (
-          <li key={m.slug} className="snap-start">
+          <li
+            key={m.slug}
+            className="snap-start rounded-lg border-t-4 border-highlight bg-surface shadow-[0_14px_30px_-16px_rgb(18_24_30/0.4)] ring-1 ring-brand/10 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_22px_40px_-18px_rgb(18_24_30/0.5)] [&>article]:rounded-t-none [&>article]:border-0"
+          >
             <MentorCard mentor={m} />
           </li>
         ))}
