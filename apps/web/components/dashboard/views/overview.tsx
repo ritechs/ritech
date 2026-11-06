@@ -1,5 +1,6 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import Link from "next/link";
 import { ArrowRight, BookOpenCheck, GraduationCap, CircleCheck, Circle, FolderKanban, Inbox, Library, Mail, UserRound, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -117,7 +118,7 @@ export function OverviewView() {
                           <span className="font-medium">{r.person.name}</span> · {REQUEST_KIND[r.kind]}
                           {r.subject ? `: ${r.subject}` : ""}
                         </p>
-                        {r.message && <p className="mt-0.5 line-clamp-2 text-sm text-muted-ink">{r.message}</p>}
+                        {r.message && <p className="mt-0.5 line-clamp-2 text-sm text-muted-ink">{richToPlainText(r.message)}</p>}
                         <p className="mt-1 text-xs text-faint-ink">{fmtDate(r.createdAt)}</p>
                       </div>
                       <Badge tone={statusTone(r.status)}>{r.status === "pending" ? "Waiting" : r.status[0]!.toUpperCase() + r.status.slice(1)}</Badge>

@@ -108,7 +108,7 @@ describe("member dashboard", () => {
     await mentee.agent.patch("/api/me/profile").send({ bio: "PhD student in machine learning.", links: { scholar: "https://scholar.google.com/citations?user=abc" } }).expect(200);
     await mentee.agent.post("/api/me/workspace/requests").send({ kind: "mentorship", mentor: await slugOf(mentor.userId), message: "Please guide my thesis work." }).expect(201);
     const inbox = await mentor.agent.get("/api/me/workspace/requests?box=in").expect(200);
-    expect(inbox.body.items[0].person.profile.bio).toBe("PhD student in machine learning.");
+    expect(inbox.body.items[0].person.profile.bio).toBe("<p>PhD student in machine learning.</p>");
     expect(inbox.body.items[0].person.profile.links.scholar).toContain("scholar.google.com");
     expect(inbox.body.items[0].person.email).toBeNull();
     // The mentee's own sent list does not carry the mentor's private profile fields.

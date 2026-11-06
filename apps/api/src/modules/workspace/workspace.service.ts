@@ -7,6 +7,7 @@ import { isUniqueViolation } from "../content/conferences.service.js";
 import { Inject, Injectable } from "@nestjs/common";
 import { schema, type Database, type MemberProject } from "@ritechs/db";
 import type { fundingCallSchema, memberMessageSchema, memberRequestSchema, mentorCourseSchema, requestResponseSchema } from "@ritechs/shared";
+import { richToPlainText } from "@ritechs/shared";
 import { aliasedTable, and, count, desc, eq, gte, inArray, isNull, ne, or, sql, type SQL } from "drizzle-orm";
 import type { z } from "zod";
 import { ENV, type Env } from "../../config/env.js";
@@ -101,7 +102,7 @@ export class WorkspaceService {
     const mentor = me.type === "mentor";
     const checklist = [
       { key: "photo", label: "Add a profile photo", done: !!(f.photoId || f.legacyPhotoPath), href: "/dashboard/profile" },
-      { key: "bio", label: "Write a short biography", done: f.bio.trim().length >= 80, href: "/dashboard/biography" },
+      { key: "bio", label: "Write a short biography", done: richToPlainText(f.bio).length >= 80, href: "/dashboard/biography" },
       { key: "position", label: "Add your position and organisation", done: !!(f.position && f.affiliation), href: "/dashboard/profile" },
       { key: "field", label: mentor ? "Name your field of research" : "Name your field of study", done: !!f.researchField, href: "/dashboard/biography" },
       { key: "expertise", label: "Choose your areas of expertise", done: expertise!.n > 0, href: "/dashboard/expertise" },
@@ -412,7 +413,7 @@ export class WorkspaceService {
     await this.audit.record({ action: "member.request_sent", entityType: "member_request", entityId: row!.id, metadata: { kind: input.kind } });
     const [to] = await this.db.select({ email: schema.user.email, name: schema.user.name }).from(schema.user).where(eq(schema.user.id, toUserId));
     if (to)
-      await this.mail.queue(to.email, "member-request", { name: to.name, from: me.name, what, message: input.message.slice(0, 500), subject: `New request from ${me.name}`, url: this.dashUrl("/requests") }, { dedupeKey: `request:${row!.id}` });
+      await this.mail.queue(to.email, "member-request", { name: to.name, from: me.name, what, message: richToPlainText(input.message).slice(0, 500), subject: `New request from ${me.name}`, url: this.dashUrl("/requests") }, { dedupeKey: `request:${row!.id}` });
     return row;
   }
 
@@ -442,7 +443,7 @@ export class WorkspaceService {
       const what = row.kind === "mentorship" ? "mentorship" : row.kind === "course" ? "to join a course" : "a funding application";
       const answer = input.status === "accepted" ? "accepted" : row.status === "accepted" ? "ended" : "declined";
       if (from && me)
-        await this.mail.queue(from.email, "member-request-answer", { name: from.name, from: me.name, answer, what, reply: (input.reply ?? "").slice(0, 500), subject: `${me.name} ${answer} your request`, url: this.dashUrl("/requests?box=out") }, { dedupeKey: `answer:${id}:${input.status}` });
+        await this.mail.queue(from.email, "member-request-answer", { name: from.name, from: me.name, answer, what, reply: richToPlainText(input.reply).slice(0, 500), subject: `${me.name} ${answer} your request`, url: this.dashUrl("/requests?box=out") }, { dedupeKey: `answer:${id}:${input.status}` });
     }
     return updated;
   }

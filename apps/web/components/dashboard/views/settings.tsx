@@ -1,10 +1,11 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Panel, fmtDate, useToast } from "@/components/admin/ui";
-import { TextArea } from "@/components/admin/form";
+import { RichTextArea } from "@/components/admin/form";
 import { ChangePasswordCard, TwoFactorCard } from "@/components/account/security-settings";
 import { useMember } from "@/components/dashboard/shell";
 import { send } from "@/lib/admin/use-api";
@@ -20,7 +21,7 @@ function MembershipChange() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (reason.trim().length < 10) {
+    if (richToPlainText(reason).length < 10) {
       setError("Tell us in a sentence or two why you would like to change.");
       document.getElementById("f-reason")?.focus();
       return;
@@ -48,7 +49,7 @@ function MembershipChange() {
         <p className="mt-2 text-sm text-muted-ink">You can ask to change once your membership is approved.</p>
       ) : (
         <form noValidate onSubmit={submit} className="mt-4 space-y-3">
-          <TextArea id="reason" label={`Why would you like to become a ${other}?`} value={reason} onChange={setReason} errors={error ? { reason: error } : undefined} rows={3} hint={other === "mentor" ? "For example, you have completed your PhD and now supervise students." : undefined} />
+          <RichTextArea id="reason" label={`Why would you like to become a ${other}?`} value={reason} onChange={setReason} errors={error ? { reason: error } : undefined} rows={3} max={1000} hint={other === "mentor" ? "For example, you have completed your PhD and now supervise students." : undefined} />
           <Button type="submit" variant="outline" disabled={saving}>
             {saving && <Spinner />}
             {saving ? "Sending…" : `Ask to Become a ${other === "mentor" ? "Mentor" : "Mentee"}`}

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Loading, Pager, Panel, Tabs, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, RichTextArea, TextInput, focusFirstError } from "@/components/admin/form";
 import { ImageField, SearchBox, Thumb } from "@/components/admin/media";
 import { useAdmin } from "@/components/admin/shell";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
@@ -133,7 +133,7 @@ export function SpeakersView() {
         name: f.name.trim(),
         designation: orNull(f.designation),
         organisation: orNull(f.organisation),
-        bio: orNull(f.bio),
+        bio: f.bio || null,
         website: orNull(f.website),
         ...(f.photo.changed ? { photoId: f.photo.id } : {}),
       });
@@ -262,7 +262,7 @@ export function SpeakersView() {
               className="sm:col-span-2"
             />
           </FormGrid>
-          <TextArea id="bio" label="Short biography (optional)" value={edit.form.bio} onChange={(v) => set({ bio: v })} errors={errors} rows={4} />
+          <RichTextArea id="bio" label="Short biography (optional)" value={edit.form.bio} onChange={(v) => set({ bio: v })} errors={errors} rows={4} max={3000} />
         </EditDialog>
       )}
       <Confirm

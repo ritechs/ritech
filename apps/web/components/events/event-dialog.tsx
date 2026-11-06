@@ -1,5 +1,6 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import Link from "next/link";
 import { CalendarDays, Clock, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,7 +31,7 @@ export function EventDialog({ event, trigger }: { event: AcademicEvent; trigger:
           </div>
           {event.shortTitle && <p className="mt-4 font-serif text-xl text-brand">{event.shortTitle}</p>}
           <DialogTitle className={event.shortTitle ? "mt-1" : "mt-4"}>{event.title}</DialogTitle>
-          <DialogDescription className="mt-2">{event.summary}</DialogDescription>
+          <DialogDescription className="mt-2">{richToPlainText(event.summary)}</DialogDescription>
 
           <ul className="mt-6 grid gap-2.5 rounded-md border border-rule bg-paper p-4 text-[0.9375rem] text-ink sm:grid-cols-2">
             <li className="flex items-start gap-2.5">

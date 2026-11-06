@@ -1,4 +1,4 @@
-import { MEMBER_STATUSES, MEMBER_TYPES, countryCode, line, membershipChangeSchema, profileUpdateSchema } from "@ritechs/shared";
+import { MEMBER_STATUSES, MEMBER_TYPES, countryCode, line, membershipChangeSchema, profileUpdateSchema, richText } from "@ritechs/shared";
 import { z } from "zod";
 import { listQuery } from "../../common/http.js";
 
@@ -17,19 +17,19 @@ export type MemberListQuery = z.infer<typeof memberListQuery>;
 
 export const reviewSchema = z.object({
   action: z.enum(["approve", "reject", "suspend", "reinstate"]),
-  note: line(500).optional(),
+  note: richText(500).optional(),
 });
 export type ReviewInput = z.infer<typeof reviewSchema>;
 
 export const bulkReviewSchema = z.object({
   userIds: z.array(z.string().min(1).max(64)).min(1).max(100),
   action: z.enum(["approve", "reject"]),
-  note: line(500).optional(),
+  note: richText(500).optional(),
 });
 
 export const memberFlagsSchema = z.object({ featured: z.boolean().optional(), showInDirectory: z.boolean().optional() }).refine((v) => Object.keys(v).length > 0, "Nothing to update.");
 
-export const changeReviewSchema = z.object({ action: z.enum(["approve", "reject"]), note: line(500).optional() });
+export const changeReviewSchema = z.object({ action: z.enum(["approve", "reject"]), note: richText(500).optional() });
 export const changeListQuery = listQuery.extend({ status: z.enum(["pending", "approved", "rejected"]).optional() });
 
 export { membershipChangeSchema, profileUpdateSchema };

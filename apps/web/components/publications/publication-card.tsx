@@ -1,3 +1,4 @@
+import { richToPlainText } from "@ritechs/shared";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { AbstractDialog } from "@/components/publications/abstract-dialog";
@@ -32,7 +33,7 @@ export function PublicationCard({ publication, className }: { publication: Publi
       </p>
       <p className="mt-0.5 line-clamp-2 font-serif text-[0.875rem] text-faint-ink italic">{publication.venue}</p>
 
-      <p className="mt-4 line-clamp-3 text-[0.9375rem] leading-relaxed text-muted-ink">{publication.abstract}</p>
+      <p className="mt-4 line-clamp-3 text-[0.9375rem] leading-relaxed text-muted-ink">{richToPlainText(publication.abstract)}</p>
       <DoiLine publication={publication} className="mt-4" />
 
       <div className="flex-1" aria-hidden />

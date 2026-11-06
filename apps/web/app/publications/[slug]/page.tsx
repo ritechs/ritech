@@ -1,3 +1,5 @@
+import { RichContent } from "@/components/page/rich-text";
+import { richExcerpt } from "@ritechs/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -19,7 +21,7 @@ export async function generateMetadata({ params }: PageProps<"/publications/[slu
   const { slug } = await params;
   const p = await getPublicationBySlug(slug);
   if (!p) return { title: "Publication not found" };
-  return { title: p.title, description: p.abstract.slice(0, 155) };
+  return { title: p.title, description: richExcerpt(p.abstract, 155) };
 }
 
 async function PublicationPageContent({ params }: { params: PageProps<"/publications/[slug]">["params"] }) {
@@ -53,7 +55,7 @@ async function PublicationPageContent({ params }: { params: PageProps<"/publicat
             </p>
           )}
           <h2 className="text-sm font-medium text-ink">Abstract</h2>
-          <p className="mt-3 max-w-[68ch] font-serif text-[1.1875rem] leading-[1.75] text-ink/90 numerals-oldstyle">{p.abstract}</p>
+          <RichContent value={p.abstract} className="mt-3 max-w-[68ch] font-serif text-[1.1875rem] leading-[1.75] text-ink/90 numerals-oldstyle" />
           <h2 className="mt-10 text-sm font-medium text-ink">Keywords</h2>
           <ul className="mt-3 flex flex-wrap gap-2">
             {p.keywords.map((k) => (

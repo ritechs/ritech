@@ -9,10 +9,10 @@ import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { useAdmin } from "@/components/admin/shell";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Loading, Pager, Panel, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, Repeater, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, Repeater, RichTextArea, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
 import { EntityPicker, ORGANISATIONS, PdfField, SPEAKERS, type Picked } from "@/components/admin/pickers";
-import { ImageField } from "@/components/admin/media";
-import { htmlToText, lines, textToHtml } from "@/lib/admin/text";
+import { ImageField, uploadEditorImage } from "@/components/admin/media";
+import { lines } from "@/lib/admin/text";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
 import { useUrlState } from "@/lib/admin/url-state";
 import { routes } from "@/lib/site";
@@ -105,7 +105,6 @@ interface Form {
   slug: string; acronym: string; title: string; summary: string; objective: string; about: string; joinUs: string; paperSubmission: string;
   highlights: string; cameraReady: string; cameraReadyUrl: string; registrationNote: string;
   /** Formatted HTML as loaded, reused for any text field left unchanged so its formatting survives a save. */
-  original: Partial<Record<RichField, { text: string; html: string }>>;
   socialLinks: { network: string; url: string }[];
   publication: string; venue: string; location: string; mode: string; startDate: string; endDate: string; externalUrl: string; submissionUrl: string;
   status: string; featured: boolean;
@@ -118,22 +117,19 @@ interface FileState { id: string | null; url: string | null; legacy: boolean; ch
 const NO_FILE: FileState = { id: null, url: null, legacy: false, changed: false };
 
 type RichField = "about" | "joinUs" | "paperSubmission" | "highlights" | "cameraReady";
-const RICH_FIELDS: RichField[] = ["about", "joinUs", "paperSubmission", "highlights", "cameraReady"];
 
 const EMPTY: Form = {
   slug: "", acronym: "", title: "", summary: "", objective: "", about: "", joinUs: "", paperSubmission: "",
-  highlights: "", cameraReady: "", cameraReadyUrl: "", registrationNote: "", original: {}, socialLinks: [], publication: "", venue: "", location: "", mode: "in-person",
+  highlights: "", cameraReady: "", cameraReadyUrl: "", registrationNote: "", socialLinks: [], publication: "", venue: "", location: "", mode: "in-person",
   startDate: "", endDate: "", externalUrl: "", submissionUrl: "", status: "draft", featured: false, tracks: [], dates: [], fees: [], committee: [], awards: [], sponsorship: [], speakers: [], sponsors: [], cover: NO_FILE, cfp: NO_FILE, cameraReadyFile: NO_FILE,
 };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function fromApi(c: any): Form {
   const s = (v: unknown) => (v == null ? "" : String(v));
-  const original: Form["original"] = {};
-  for (const k of RICH_FIELDS) if (c[k]) original[k] = { text: htmlToText(c[k]), html: c[k] };
   return {
-    slug: c.slug, acronym: c.acronym, title: c.title, summary: s(c.summary), objective: s(c.objective), about: htmlToText(c.about), joinUs: htmlToText(c.joinUs), paperSubmission: htmlToText(c.paperSubmission),
-    highlights: htmlToText(c.highlights), cameraReady: htmlToText(c.cameraReady), cameraReadyUrl: s(c.cameraReadyUrl), registrationNote: s(c.registrationNote), original, socialLinks: c.socialLinks ?? [],
+    slug: c.slug, acronym: c.acronym, title: c.title, summary: s(c.summary), objective: s(c.objective), about: s(c.about), joinUs: s(c.joinUs), paperSubmission: s(c.paperSubmission),
+    highlights: s(c.highlights), cameraReady: s(c.cameraReady), cameraReadyUrl: s(c.cameraReadyUrl), registrationNote: s(c.registrationNote), socialLinks: c.socialLinks ?? [],
     publication: (c.publication ?? []).join("\n"), venue: s(c.venue), location: s(c.location), mode: c.mode, startDate: s(c.startDate), endDate: s(c.endDate), externalUrl: s(c.externalUrl), submissionUrl: s(c.submissionUrl),
     status: c.status, featured: !!c.featured,
     tracks: c.tracks.map((t: any) => ({ title: t.title, description: s(t.description), scope: s(t.scope), chairs: (t.chairs ?? []).join("\n") })),
@@ -155,16 +151,11 @@ const money = (v: string) => (v.trim() === "" ? null : v.replace(/[^\d.]/g, ""))
 const orNull = (v: string) => (v.trim() ? v.trim() : null);
 
 function toApi(f: Form) {
-  const rich = (k: RichField) => {
-    const text = f[k];
-    if (!text.trim()) return null;
-    const o = f.original[k];
-    return o && o.text === text ? o.html : textToHtml(text);
-  };
+  const rich = (k: RichField) => f[k] || null;
   return {
-    slug: f.slug.trim(), acronym: f.acronym.trim(), title: f.title.trim(), summary: orNull(f.summary), objective: orNull(f.objective),
+    slug: f.slug.trim(), acronym: f.acronym.trim(), title: f.title.trim(), summary: f.summary || null, objective: f.objective || null,
     about: rich("about"), joinUs: rich("joinUs"), paperSubmission: rich("paperSubmission"), highlights: rich("highlights"), cameraReady: rich("cameraReady"),
-    cameraReadyUrl: orNull(f.cameraReadyUrl), registrationNote: orNull(f.registrationNote),
+    cameraReadyUrl: orNull(f.cameraReadyUrl), registrationNote: f.registrationNote || null,
     publication: lines(f.publication), venue: orNull(f.venue), location: orNull(f.location), mode: f.mode, startDate: orNull(f.startDate), endDate: orNull(f.endDate),
     externalUrl: orNull(f.externalUrl), submissionUrl: orNull(f.submissionUrl), status: f.status, featured: f.featured,
     tracks: f.tracks.map((t) => ({ title: t.title.trim(), description: orNull(t.description), scope: orNull(t.scope), chairs: lines(t.chairs) })),
@@ -183,7 +174,6 @@ function toApi(f: Form) {
   };
 }
 
-const TEXT_HINT = "Leave a blank line between paragraphs. Start lines with “- ” for a bullet list.";
 
 export function ConferenceEditor({ id }: { id: string }) {
   const isNew = id === "new";
@@ -267,16 +257,16 @@ export function ConferenceEditor({ id }: { id: string }) {
 
         <Panel title="Text">
           <div className="space-y-4">
-            <TextArea id="summary" label="Short summary" value={form.summary} onChange={(v) => set({ summary: v })} errors={errors} rows={2} />
-            <TextArea id="highlights" label="Highlights" value={form.highlights} onChange={(v) => set({ highlights: v })} errors={errors} hint={`Shown at the top, e.g. publisher and indexing. ${TEXT_HINT}`} rows={4} />
-            <TextArea id="about" label="Introduction" value={form.about} onChange={(v) => set({ about: v })} errors={errors} hint={TEXT_HINT} rows={6} />
-            <TextArea id="objective" label="Objective" value={form.objective} onChange={(v) => set({ objective: v })} errors={errors} rows={4} />
+            <RichTextArea id="summary" label="Short summary" value={form.summary} onChange={(v) => set({ summary: v })} errors={errors} rows={2} max={1000} />
+            <RichTextArea id="highlights" label="Highlights" variant="full" value={form.highlights} onChange={(v) => set({ highlights: v })} errors={errors} hint="Shown at the top, e.g. publisher and indexing." rows={4} onUploadImage={uploadEditorImage} />
+            <RichTextArea id="about" label="Introduction" variant="full" value={form.about} onChange={(v) => set({ about: v })} errors={errors} rows={6} onUploadImage={uploadEditorImage} />
+            <RichTextArea id="objective" label="Objective" variant="full" value={form.objective} onChange={(v) => set({ objective: v })} errors={errors} rows={4} onUploadImage={uploadEditorImage} />
             <TextArea id="publication" label="Publication" value={form.publication} onChange={(v) => set({ publication: v })} errors={errors} hint="One line per item, e.g. “Springer proceedings (Scopus-indexed)”." rows={3} />
-            <TextArea id="joinUs" label="Join us" value={form.joinUs} onChange={(v) => set({ joinUs: v })} errors={errors} hint={TEXT_HINT} rows={4} />
-            <TextArea id="paperSubmission" label="Paper submission guide" value={form.paperSubmission} onChange={(v) => set({ paperSubmission: v })} errors={errors} hint={TEXT_HINT} rows={6} />
-            <TextArea id="cameraReady" label="Camera-ready instructions" value={form.cameraReady} onChange={(v) => set({ cameraReady: v })} errors={errors} hint={TEXT_HINT} rows={4} />
+            <RichTextArea id="joinUs" label="Join us" variant="full" value={form.joinUs} onChange={(v) => set({ joinUs: v })} errors={errors} rows={4} onUploadImage={uploadEditorImage} />
+            <RichTextArea id="paperSubmission" label="Paper submission guide" variant="full" value={form.paperSubmission} onChange={(v) => set({ paperSubmission: v })} errors={errors} rows={6} onUploadImage={uploadEditorImage} />
+            <RichTextArea id="cameraReady" label="Camera-ready instructions" variant="full" value={form.cameraReady} onChange={(v) => set({ cameraReady: v })} errors={errors} rows={4} onUploadImage={uploadEditorImage} />
             <TextInput id="cameraReadyUrl" label="Camera-ready link (optional)" type="url" value={form.cameraReadyUrl} onChange={(v) => set({ cameraReadyUrl: v })} errors={errors} placeholder="https://ecopyright.ieee.org/…" />
-            <TextArea id="registrationNote" label="Note above the fees" value={form.registrationNote} onChange={(v) => set({ registrationNote: v })} errors={errors} rows={2} />
+            <RichTextArea id="registrationNote" label="Note above the fees" value={form.registrationNote} onChange={(v) => set({ registrationNote: v })} errors={errors} rows={2} max={2000} />
           </div>
         </Panel>
 

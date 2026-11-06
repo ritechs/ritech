@@ -125,7 +125,7 @@ describe("website pages", () => {
     const pub = await admin.agent.put("/api/admin/pages").send({ slug: "qa-page", title: "QA Page", intro: "Short intro.", body: "<h2>Hello</h2><p>Text <script>x()</script></p>", status: "published" }).expect(200);
     expect(pub.body.body).not.toContain("script");
     const live = await visitor().get("/api/pages/qa-page").expect(200);
-    expect(live.body).toMatchObject({ title: "QA Page", intro: "Short intro." });
+    expect(live.body).toMatchObject({ title: "QA Page", intro: "<p>Short intro.</p>" });
     expect((await visitor().get("/api/pages").expect(200)).body.map((p: { slug: string }) => p.slug)).toContain("qa-page");
     await admin.agent.delete("/api/admin/pages/qa-page").expect(204);
     await visitor().get("/api/pages/qa-page").expect(404);

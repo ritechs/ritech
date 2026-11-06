@@ -10,10 +10,10 @@ import { NativeSelect } from "@/components/ui/native-select";
 import { Spinner } from "@/components/ui/spinner";
 import { useAdmin } from "@/components/admin/shell";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Loading, Pager, Panel, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, RichTextArea, Select, TextInput, focusFirstError } from "@/components/admin/form";
 import { EntityPicker, SPEAKERS, type Picked } from "@/components/admin/pickers";
-import { ImageField } from "@/components/admin/media";
-import { htmlToText, slugify, textToHtml } from "@/lib/admin/text";
+import { ImageField, uploadEditorImage } from "@/components/admin/media";
+import { slugify } from "@/lib/admin/text";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
 import { useUrlState } from "@/lib/admin/url-state";
 
@@ -117,7 +117,7 @@ const fromLocal = (v: string) => (v ? new Date(v).toISOString() : null);
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const fromApi = (e: any): Form => ({
-  slug: e.slug, type: e.type, title: e.title, summary: e.summary ?? "", description: htmlToText(e.description), venue: e.venue ?? "", location: e.location ?? "", mode: e.mode,
+  slug: e.slug, type: e.type, title: e.title, summary: e.summary ?? "", description: e.description ?? "", venue: e.venue ?? "", location: e.location ?? "", mode: e.mode,
   startsAt: toLocal(e.startsAt), endsAt: toLocal(e.endsAt), fee: e.fee ?? "", currency: e.currency, capacity: e.capacity ? String(e.capacity) : "", registrationOpen: e.registrationOpen, status: e.status,
   speakers: (e.speakers ?? []).map((s: any) => ({ id: s.id, name: s.name, sub: [s.designation, s.organisation].filter(Boolean).join(", ") || null, image: s.photoUrl })),
   cover: { id: e.coverId ?? null, url: e.coverUrl ?? null, changed: false },
@@ -154,7 +154,7 @@ export function EventEditor({ id }: { id: string }) {
     e.preventDefault();
     const f = form!;
     const body = {
-      slug: f.slug.trim() || slugify(f.title), type: f.type, title: f.title.trim(), summary: f.summary.trim() || null, description: f.description.trim() ? textToHtml(f.description) : null,
+      slug: f.slug.trim() || slugify(f.title), type: f.type, title: f.title.trim(), summary: f.summary || null, description: f.description || null,
       venue: f.venue.trim() || null, location: f.location.trim() || null, mode: f.mode, startsAt: fromLocal(f.startsAt), endsAt: fromLocal(f.endsAt),
       fee: f.fee.trim() ? f.fee.replace(/[^\d.]/g, "") : null, currency: f.currency || "GBP", capacity: f.capacity ? Number(f.capacity) : null, registrationOpen: f.registrationOpen, status: f.status, speakerIds: f.speakers.map((x) => x.id),
       ...(f.cover.changed ? { coverId: f.cover.id } : {}),
@@ -209,8 +209,8 @@ export function EventEditor({ id }: { id: string }) {
             <div className="sm:col-span-2">
               <Check id="registrationOpen" label="Sign-up open on the website" checked={form.registrationOpen} onChange={(v) => set({ registrationOpen: v })} />
             </div>
-            <TextArea id="summary" label="Short summary" value={form.summary} onChange={(v) => set({ summary: v })} errors={errors} rows={2} className="sm:col-span-2" />
-            <TextArea id="description" label="Description" value={form.description} onChange={(v) => set({ description: v })} errors={errors} rows={6} hint="Blank line between paragraphs; “- ” for bullets." className="sm:col-span-2" />
+            <RichTextArea id="summary" label="Short summary" value={form.summary} onChange={(v) => set({ summary: v })} errors={errors} rows={2} max={1000} className="sm:col-span-2" />
+            <RichTextArea id="description" label="Description" variant="full" value={form.description} onChange={(v) => set({ description: v })} errors={errors} rows={8} onUploadImage={uploadEditorImage} className="sm:col-span-2" />
           </FormGrid>
         </Panel>
         <Panel title="Speakers and Image">

@@ -7,7 +7,7 @@ import { ArrowLeft, ExternalLink, FileUp, Plus, Star, Trash2 } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Loading, Pager, Panel, Tabs, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, Repeater, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, Repeater, RichTextArea, Select, TextInput, focusFirstError } from "@/components/admin/form";
 import { SearchBox, uploadMedia } from "@/components/admin/media";
 import { researchAreas } from "@/lib/data/research-areas";
 import { slugify } from "@/lib/admin/text";
@@ -182,7 +182,7 @@ export function PublicationEditor({ id }: { id: string }) {
       const res = await send<{ id: string }>(isNew ? "/admin/publications" : `/admin/publications/${id}`, isNew ? "POST" : "PUT", {
         slug: f.slug.trim() || slugify(f.title).slice(0, 90),
         title: f.title.trim(),
-        abstract: f.abstract.trim(),
+        abstract: f.abstract,
         authors: f.authors.filter((a) => a.name.trim()).map((a) => ({ name: a.name.trim(), ...(a.affiliation.trim() ? { affiliation: a.affiliation.trim() } : {}) })),
         area: f.area,
         type: f.type,
@@ -242,7 +242,7 @@ export function PublicationEditor({ id }: { id: string }) {
             <TextInput id="url" label="Link to the paper (optional)" type="url" value={form.url} onChange={(v) => set({ url: v })} errors={errors} placeholder="https://…" className="sm:col-span-2" />
           </FormGrid>
           <div className="mt-4 space-y-4">
-            <TextArea id="abstract" label="Abstract" value={form.abstract} onChange={(v) => set({ abstract: v })} errors={errors} rows={7} />
+            <RichTextArea id="abstract" label="Abstract" value={form.abstract} onChange={(v) => set({ abstract: v })} errors={errors} rows={7} max={5000} />
             <TextInput id="keywords" label="Keywords" value={form.keywords} onChange={(v) => set({ keywords: v })} errors={errors} hint="Separate with commas." placeholder="e.g. intrusion detection, federated learning…" />
           </div>
         </Panel>

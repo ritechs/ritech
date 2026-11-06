@@ -1,3 +1,5 @@
+import { RichContent } from "@/components/page/rich-text";
+import { richExcerpt } from "@ritechs/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { staticSlugs } from "@/lib/utils";
@@ -38,7 +40,7 @@ function LinkRow({ title, labels, links }: { title: string; labels: Record<strin
 
 export async function generateMetadata({ params }: PageProps<"/mentorship/[slug]">): Promise<Metadata> {
   const m = await getMentorBySlug((await params).slug);
-  return m ? { title: `${m.name} — Mentor`, description: m.bio?.slice(0, 155) ?? `${m.role}, ${m.organisation}` } : { title: "Mentor not found" };
+  return m ? { title: `${m.name} — Mentor`, description: m.bio ? richExcerpt(m.bio, 155) : `${m.role}, ${m.organisation}` } : { title: "Mentor not found" };
 }
 
 async function MentorPageContent({ params }: { params: PageProps<"/mentorship/[slug]">["params"] }) {
@@ -107,11 +109,7 @@ async function MentorPageContent({ params }: { params: PageProps<"/mentorship/[s
           {m.bio && (
             <section aria-labelledby="bio-heading" className="mt-10 border-t border-rule pt-8">
               <h2 id="bio-heading" className="font-serif text-2xl text-ink">Biography</h2>
-              <div className="mt-4 max-w-[65ch] space-y-4 text-[1.0625rem] leading-[1.75] text-ink/90">
-                {m.bio.split(/\n{2,}/).map((p, i) => (
-                  <p key={i}>{p}</p>
-                ))}
-              </div>
+              <RichContent value={m.bio} className="mt-4 max-w-[65ch] text-[1.0625rem] leading-[1.75] text-ink/90" />
             </section>
           )}
           {m.projects && m.projects.length > 0 && (
@@ -137,7 +135,7 @@ async function MentorPageContent({ params }: { params: PageProps<"/mentorship/[s
                     <p className="mt-1 text-sm text-muted-ink">
                       {[c.duration ? `${c.duration} ${c.durationUnit}${c.duration === 1 ? "" : "s"}` : null, c.fee && Number(c.fee) > 0 ? new Intl.NumberFormat("en-GB", { style: "currency", currency: c.currency }).format(Number(c.fee)) : "Free"].filter(Boolean).join(" · ")}
                     </p>
-                    {c.description && <p className="mt-3 max-w-[65ch] text-[0.9375rem] leading-relaxed whitespace-pre-line text-ink/85">{c.description}</p>}
+                    {c.description && <RichContent value={c.description} compact className="mt-3 max-w-[65ch] text-[0.9375rem] leading-relaxed text-ink/85" />}
                     <div className="mt-4">
                       <MemberRequestButton target={{ kind: "course", courseId: c.id }} label="Ask to Join" title={`Join “${c.title}”`} description={`Send ${m.name} a request for a place on this course.`} variant="outline" size="sm" />
                     </div>

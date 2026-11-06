@@ -1,3 +1,4 @@
+import { RichContent } from "@/components/page/rich-text";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -36,7 +37,7 @@ export default async function NewsPage() {
                       {a.title}
                     </Link>
                   </h2>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-ink">{a.excerpt}</p>
+                  <RichContent value={a.excerpt} compact className="mt-2 text-sm leading-relaxed text-muted-ink" />
                 </div>
               </article>
             </li>

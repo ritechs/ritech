@@ -9,8 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/compone
 import { Spinner } from "@/components/ui/spinner";
 import { useAdmin } from "@/components/admin/shell";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Loading, Pager, Panel, Tabs, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, TextArea, TextInput } from "@/components/admin/form";
-import { textToHtml } from "@/lib/admin/text";
+import { Check, FormGrid, RichTextArea, TextArea, TextInput } from "@/components/admin/form";
+import { richToPlainText } from "@ritechs/shared";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
 import { useUrlState } from "@/lib/admin/url-state";
 
@@ -75,7 +75,7 @@ function NewGroup({ onCreated }: { onCreated: () => void }) {
               }}
             >
               <TextInput id="name" label="Name" value={name} onChange={setName} errors={errors} />
-              <TextArea id="description" label="Description (optional)" value={description} onChange={setDescription} rows={2} />
+              <RichTextArea id="description" label="Description (optional)" value={description} onChange={setDescription} rows={2} max={500} />
               <Button type="submit" disabled={pending}>
                 {pending && <Spinner />}
                 {pending ? "Creating…" : "Create Group"}
@@ -102,7 +102,7 @@ function Compose({ groups, onSaved, isAdmin }: { groups: Group[]; onSaved: () =>
   async function saveDraft() {
     const res = await send<{ id: string }>("/admin/mailing/campaigns", "POST", {
       subject,
-      bodyHtml: textToHtml(body),
+      bodyHtml: body,
       audience: { memberTypes: types, groupIds, newsletter },
     });
     if (!res.ok) {
@@ -118,14 +118,15 @@ function Compose({ groups, onSaved, isAdmin }: { groups: Group[]; onSaved: () =>
     <Panel title="Write an Email">
       <div className="space-y-4">
         <TextInput id="subject" label="Subject" value={subject} onChange={setSubject} errors={errors} />
-        <TextArea
+        <RichTextArea
           id="bodyHtml"
           label="Message"
+          variant="full"
           value={body}
           onChange={setBody}
           errors={errors}
           rows={10}
-          hint="Blank line between paragraphs; “- ” for bullets. An unsubscribe link is added automatically."
+          hint="An unsubscribe link is added automatically."
         />
         <fieldset>
           <legend className="text-sm font-medium text-ink">Send to</legend>
@@ -261,7 +262,7 @@ export function MailingView() {
                 {
                   key: "desc",
                   header: "Description",
-                  cell: (r) => r.description ?? "—",
+                  cell: (r) => (r.description ? richToPlainText(r.description) : "—"),
                   hideBelow: "md",
                 },
               ]}
@@ -430,7 +431,7 @@ function GroupDetails({ id, name, description, onSaved }: { id: string; name: st
           start(async () => {
             const res = await send(`/admin/mailing/groups/${id}`, "PUT", {
               name: n.trim(),
-              description: d.trim() || null,
+              description: d || null,
             });
             if (!res.ok) return setErrors(res.fields ?? { name: res.message });
             toast("success", "Group saved.");
@@ -441,7 +442,7 @@ function GroupDetails({ id, name, description, onSaved }: { id: string; name: st
       >
         <FormGrid>
           <TextInput id="name" label="Name" value={n} onChange={setN} errors={errors} />
-          <TextArea id="description" label="Description (optional)" value={d} onChange={setD} errors={errors} rows={2} />
+          <RichTextArea id="description" label="Description (optional)" value={d} onChange={setD} errors={errors} rows={2} max={500} />
         </FormGrid>
         <div className="mt-4 flex gap-2">
           <Button type="submit" disabled={pending}>
@@ -494,7 +495,7 @@ export function MailGroupView({ id }: { id: string }) {
   return (
     <AdminPage
       title={group?.name ?? "Mail Group"}
-      description={group?.description ?? undefined}
+      description={group?.description ? richToPlainText(group.description) : undefined}
       actions={
         <Button asChild variant="ghost" size="sm">
           <Link href="/admin/mailing">

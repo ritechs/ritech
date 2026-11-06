@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Badge, Confirm, Empty, ErrorNote, Loading, Panel, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
-import { FormGrid, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { FormGrid, RichTextArea, Select, TextInput, focusFirstError } from "@/components/admin/form";
 import { uploadMedia } from "@/components/admin/media";
 import { LegacyImage } from "@/components/media/legacy-image";
 import { slugify } from "@/lib/admin/text";
@@ -138,7 +138,7 @@ export function AlbumEditor({ id }: { id: string }) {
       const res = await send<{ id: string }>(isNew ? "/admin/gallery" : `/admin/gallery/${id}`, isNew ? "POST" : "PUT", {
         slug: f.slug.trim() || slugify(f.title),
         title: f.title.trim(),
-        description: f.description.trim() || null,
+        description: f.description || null,
         takenOn: f.takenOn || null,
         status: f.status,
         items: f.photos.map((p) => ({ mediaId: p.mediaId, legacyPath: p.legacyPath, caption: p.caption.trim() || null })),
@@ -185,7 +185,7 @@ export function AlbumEditor({ id }: { id: string }) {
             <TextInput id="slug" label="Web address" value={form.slug} onChange={(v) => set({ slug: v })} errors={errors} placeholder="Made from the title if left empty…" />
           </FormGrid>
           <div className="mt-4">
-            <TextArea id="description" label="Description (optional)" value={form.description} onChange={(v) => set({ description: v })} errors={errors} rows={2} />
+            <RichTextArea id="description" label="Description (optional)" value={form.description} onChange={(v) => set({ description: v })} errors={errors} rows={2} max={2000} />
           </div>
         </Panel>
 

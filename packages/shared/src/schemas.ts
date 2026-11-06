@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { richText } from "./rich-text.js";
 import { isValidPhoneNumber, type CountryCode } from "libphonenumber-js/min";
 import {
   ATTENDANCE_MODES,
@@ -93,14 +94,14 @@ export const mentorRegistrationSchema = memberBase.extend({
   type: z.literal("mentor"),
   position: z.enum(positions.mentor as [string, ...string[]], { error: "Select your current position." }),
   qualification: z.enum(qualifications.mentor as [string, ...string[]], { error: "Select your highest qualification." }),
-  bio: paragraphText(BIO_MAX, BIO_MIN_MENTOR),
+  bio: richText(BIO_MAX, BIO_MIN_MENTOR),
 });
 
 export const menteeRegistrationSchema = memberBase.extend({
   type: z.literal("mentee"),
   position: z.enum(positions.mentee as [string, ...string[]], { error: "Select your current position." }),
   qualification: z.enum(qualifications.mentee as [string, ...string[]], { error: "Select your highest qualification." }),
-  bio: paragraphText(BIO_MAX).optional().default(""),
+  bio: richText(BIO_MAX).optional().default(""),
 });
 
 export const memberRegistrationSchema = z.discriminatedUnion("type", [mentorRegistrationSchema, menteeRegistrationSchema]);
@@ -131,7 +132,7 @@ export const profileUpdateSchema = z
     country: countryCode,
     position: line(80),
     qualification: line(80),
-    bio: paragraphText(PROFILE_BIO_MAX),
+    bio: richText(PROFILE_BIO_MAX),
     expertiseIds: z.array(z.uuid()).max(12),
     showInDirectory: z.boolean(),
     city: line(120, 0),
@@ -143,7 +144,7 @@ export const profileUpdateSchema = z
 
 export const membershipChangeSchema = z.object({
   toType: z.enum(MEMBER_TYPES),
-  reason: paragraphText(1000, 10),
+  reason: richText(1000, 10),
 });
 
 /* ------------------------------- public forms ------------------------------ */
@@ -158,7 +159,7 @@ export const contactSchema = z.object({
   name: line(120),
   email,
   subject: line(160),
-  message: paragraphText(5000, 10),
+  message: richText(5000, 10),
   website: z.string().max(0).optional(),
 });
 
@@ -209,7 +210,7 @@ export const memberProjectsSchema = z.object({ projects: z.array(memberProjectSc
 export const COURSE_UNITS = ["hour", "day", "week", "month"] as const;
 export const mentorCourseSchema = z.object({
   title: line(200),
-  description: paragraphText(3000),
+  description: richText(3000),
   duration: z.number().int().min(1).max(1000).nullable(),
   durationUnit: z.enum(COURSE_UNITS),
   fee: z.number().min(0).max(1_000_000).nullable(),
@@ -219,7 +220,7 @@ export const mentorCourseSchema = z.object({
 
 export const fundingCallSchema = z.object({
   title: line(200),
-  description: paragraphText(5000),
+  description: richText(5000),
   deadline: isoDate.nullable(),
   link: z.union([z.literal(""), httpsUrl]).nullable(),
   expertiseIds: z.array(z.uuid()).max(12),
@@ -230,17 +231,17 @@ export const resourceLinkSchema = z.object({ title: line(200), url: httpsUrl });
 
 export const REQUEST_KINDS = ["mentorship", "course", "funding"] as const;
 export const memberRequestSchema = z.discriminatedUnion("kind", [
-  z.object({ kind: z.literal("mentorship"), mentor: slug, message: paragraphText(2000, 10) }),
-  z.object({ kind: z.literal("course"), courseId: z.uuid(), message: paragraphText(2000) }),
-  z.object({ kind: z.literal("funding"), fundingId: z.uuid(), message: paragraphText(2000, 10) }),
+  z.object({ kind: z.literal("mentorship"), mentor: slug, message: richText(2000, 10) }),
+  z.object({ kind: z.literal("course"), courseId: z.uuid(), message: richText(2000) }),
+  z.object({ kind: z.literal("funding"), fundingId: z.uuid(), message: richText(2000, 10) }),
 ]);
-export const requestResponseSchema = z.object({ status: z.enum(["accepted", "declined", "withdrawn"]), reply: paragraphText(2000).optional() });
+export const requestResponseSchema = z.object({ status: z.enum(["accepted", "declined", "withdrawn"]), reply: richText(2000).optional() });
 
 export const memberMessageSchema = z.object({
   to: z.array(z.string().min(1).max(64)).min(1, "Choose who to send it to.").max(50),
   subject: line(200),
-  body: paragraphText(5000, 1),
+  body: richText(5000, 1),
 });
 
 /** A member writing to the RiTECHS team from their dashboard (arrives in Admin → Inbox). */
-export const supportMessageSchema = z.object({ subject: line(160), message: paragraphText(5000, 10) });
+export const supportMessageSchema = z.object({ subject: line(160), message: richText(5000, 10) });

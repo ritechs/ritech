@@ -1,10 +1,12 @@
 "use client";
 
+import { RichContent } from "@/components/page/rich-text";
+import { richToPlainText } from "@ritechs/shared";
 import { useEffect, useState } from "react";
 import { PenLine, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminPage, Confirm, Empty, ErrorNote, Loading, Pager, Panel, Tabs, fmtDate, useToast } from "@/components/admin/ui";
-import { TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { RichTextArea, TextInput, focusFirstError } from "@/components/admin/form";
 import { EditDialog } from "@/components/admin/views/library";
 import { useMember } from "@/components/dashboard/shell";
 import { apiRaw } from "@/lib/api/client";
@@ -81,7 +83,7 @@ export function MessagesView() {
     const e: Record<string, string> = {};
     if (!to.length) e.to = "Choose at least one person.";
     if (!subject.trim()) e.subject = "Add a subject, like “Draft feedback”.";
-    if (!body.trim()) e.body = "Write your message.";
+    if (!richToPlainText(body)) e.body = "Write your message.";
     setErrors(e);
     if (Object.keys(e).length) return focusFirstError(e);
     setSaving(true);
@@ -138,12 +140,12 @@ export function MessagesView() {
                           <span className="text-xs text-faint-ink">{fmtDate(m.createdAt, true)}</span>
                         </span>
                         <span className={cn("block truncate text-sm", unread ? "font-medium text-ink" : "text-muted-ink")}>{m.subject}</span>
-                        {!isOpen && <span className="block truncate text-sm text-faint-ink">{m.body}</span>}
+                        {!isOpen && <span className="block truncate text-sm text-faint-ink">{richToPlainText(m.body)}</span>}
                       </span>
                     </button>
                     {isOpen && (
                       <div className="mb-3 ml-7 rounded-md border border-rule bg-paper/50 p-4">
-                        <p className="text-sm whitespace-pre-line text-ink">{m.body}</p>
+                        <RichContent value={m.body} compact className="text-sm text-ink" />
                         <div className="mt-4 flex flex-wrap gap-2">
                           {box === "in" && (
                             <Button size="sm" onClick={() => void startCompose(m.person.id, m.subject)} disabled={!approved}>
@@ -190,7 +192,7 @@ export function MessagesView() {
           {errors.to && <p className="mt-1.5 text-sm text-destructive">{errors.to}</p>}
         </fieldset>
         <TextInput id="subject" label="Subject" value={subject} onChange={setSubject} errors={errors} placeholder="Feedback on your draft…" />
-        <TextArea id="body" label="Message" value={body} onChange={setBody} errors={errors} rows={8} />
+        <RichTextArea id="body" label="Message" value={body} onChange={setBody} errors={errors} rows={8} max={5000} />
       </EditDialog>
 
       <Confirm

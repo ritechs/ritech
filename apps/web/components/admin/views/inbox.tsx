@@ -1,5 +1,6 @@
 "use client";
 
+import { RichContent } from "@/components/page/rich-text";
 import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -150,7 +151,7 @@ export function InboxView() {
                   </p>
                   {open === m.id && (
                     <div className="mt-3 rounded-md bg-paper p-4">
-                      <p className="max-w-[70ch] text-[0.9375rem] whitespace-pre-line text-ink">{m.message}</p>
+                      <RichContent value={m.message} compact className="max-w-[70ch] text-[0.9375rem] text-ink" />
                       <div className="mt-3 flex gap-2">
                         <Button asChild size="sm"><a href={`mailto:${m.email}?subject=${encodeURIComponent(`Re: ${m.subject}`)}`}>Reply by Email</a></Button>
                         {m.status !== "archived" && <Button size="sm" variant="outline" onClick={() => void markMessage(m, "archived")}>Archive</Button>}

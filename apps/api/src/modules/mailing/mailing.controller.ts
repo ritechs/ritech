@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Header, HttpCode, Param, Post, Put, Query } from "@nestjs/common";
-import { email, line, paragraphText } from "@ritechs/shared";
+import { email, line, paragraphText, richText } from "@ritechs/shared";
 import { z } from "zod";
 import { AdminOnly, CurrentUser, Staff } from "../../auth/decorators.js";
 import type { SessionUser } from "../../auth/auth.service.js";
@@ -8,7 +8,7 @@ import { zod } from "../../common/zod.pipe.js";
 import { MailingService } from "./mailing.service.js";
 
 const id = zod(z.uuid());
-const groupInput = z.object({ name: line(120), description: paragraphText(500).nullable().optional() });
+const groupInput = z.object({ name: line(120), description: richText(500).nullable().optional() });
 const membersInput = z.object({ people: z.array(z.object({ email, name: line(120).optional() })).min(1).max(5000) });
 const campaignInput = z.object({
   subject: line(200),

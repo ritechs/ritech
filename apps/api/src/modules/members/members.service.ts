@@ -1,7 +1,7 @@
 import { isUniqueViolation } from "../content/conferences.service.js";
 import { Inject, Injectable, Logger } from "@nestjs/common";
 import { schema, type Database } from "@ritechs/db";
-import { memberRegistrationSchema, type MemberRegistration } from "@ritechs/shared";
+import { memberRegistrationSchema, richToPlainText, type MemberRegistration } from "@ritechs/shared";
 import { fromNodeHeaders } from "better-auth/node";
 import { and, asc, count, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
 import { parsePhoneNumberWithError, type CountryCode } from "libphonenumber-js/min";
@@ -336,14 +336,14 @@ export class MembersService {
       await tx.update(p).set({ status, reviewedBy: actorId, reviewedAt: new Date(), reviewNote: input.note ?? null }).where(eq(p.userId, userId));
       if (input.action === "approve" && !row.emailVerified && row.legacyId) await tx.update(schema.user).set({ emailVerified: true, updatedAt: new Date() }).where(eq(schema.user.id, userId));
       if (input.action === "suspend") {
-        await tx.update(schema.user).set({ banned: true, banReason: input.note ?? "Membership suspended", updatedAt: new Date() }).where(eq(schema.user.id, userId));
+        await tx.update(schema.user).set({ banned: true, banReason: input.note ? richToPlainText(input.note).slice(0, 500) : "Membership suspended", updatedAt: new Date() }).where(eq(schema.user.id, userId));
         await tx.delete(schema.session).where(eq(schema.session.userId, userId));
       }
       if (input.action === "reinstate") await tx.update(schema.user).set({ banned: false, banReason: null, banExpires: null, updatedAt: new Date() }).where(eq(schema.user.id, userId));
     });
     await this.audit.record({ action: `member.${input.action}`, actorId, entityType: "user", entityId: userId, metadata: { from: row.status, note: input.note } });
     if (input.action === "approve") await this.mail.queue(row.email, "member-approved", { name: row.firstName, type: row.type, url: `${this.env.WEB_URL}/login` });
-    if (input.action === "reject") await this.mail.queue(row.email, "member-rejected", { name: row.firstName, note: input.note });
+    if (input.action === "reject") await this.mail.queue(row.email, "member-rejected", { name: row.firstName, note: input.note ? richToPlainText(input.note) : undefined });
     if (row.type === "mentor") await this.revalidate.tags("mentors");
     return { userId, status };
   }

@@ -1,6 +1,8 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Plus, Trash2, ArrowUp, ArrowDown } from "lucide-react";
+import { richToPlainText } from "@ritechs/shared";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
@@ -25,6 +27,82 @@ export function TextArea({ id, label, value, onChange, errors, hint, rows = 5, c
     <Labeled id={`f-${id}`} label={label} hint={hint} error={error} className={className}>
       <Textarea id={`f-${id}`} name={id} value={value} rows={rows} onChange={(e) => onChange(e.target.value)} aria-invalid={!!error || undefined} />
     </Labeled>
+  );
+}
+
+// The editor (Tiptap) loads only where a dashboard form uses it.
+const RichTextEditor = dynamic(() => import("@/components/editor/rich-text-editor"), {
+  ssr: false,
+  loading: () => <div className="h-36 animate-pulse rounded-md border border-input bg-paper motion-reduce:animate-none" />,
+});
+
+/**
+ * A multi-line field with a formatting toolbar, for the dashboards. `variant`
+ * "full" (articles, descriptions) or "short" (summaries, biographies, messages).
+ * The value is HTML ("" when empty); old plain text is converted when loaded.
+ * `max` shows a live count of visible characters.
+ */
+export function RichTextArea({
+  id,
+  label,
+  value,
+  onChange,
+  errors,
+  hint,
+  rows = 5,
+  className,
+  variant = "short",
+  max,
+  placeholder,
+  onUploadImage,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  errors?: Errors;
+  hint?: string;
+  rows?: number;
+  className?: string;
+  variant?: "full" | "short";
+  max?: number;
+  placeholder?: string;
+  onUploadImage?: (file: File) => Promise<string>;
+}) {
+  const error = errors?.[id];
+  const count = max ? richToPlainText(value).length : 0;
+  const hintId = `f-${id}-hint`;
+  return (
+    <div className={className}>
+      <span id={`f-${id}-label`} className="text-sm font-medium text-ink" onClick={() => document.getElementById(`f-${id}`)?.focus()}>
+        {label}
+      </span>
+      <div className="mt-1.5">
+        <RichTextEditor
+          id={`f-${id}`}
+          labelId={`f-${id}-label`}
+          describedBy={error ? `f-${id}-error` : hint || max ? hintId : undefined}
+          value={value}
+          onChange={onChange}
+          variant={variant}
+          rows={rows}
+          invalid={!!error}
+          placeholder={placeholder}
+          onUploadImage={onUploadImage}
+        />
+      </div>
+      {(hint || max) && !error && (
+        <p id={hintId} className="mt-1.5 flex justify-between gap-3 text-xs text-faint-ink">
+          <span>{hint}</span>
+          {max ? <span className={cn("shrink-0 numerals-tabular", count > max && "font-medium text-destructive")}>{count} / {max}</span> : null}
+        </p>
+      )}
+      {error && (
+        <p id={`f-${id}-error`} className="mt-1.5 text-sm text-destructive">
+          {error}
+        </p>
+      )}
+    </div>
   );
 }
 

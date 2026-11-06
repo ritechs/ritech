@@ -7,7 +7,9 @@ import { ArrowLeft, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { NativeSelect } from "@/components/ui/native-select";
-import { Textarea } from "@/components/ui/textarea";
+import { richToPlainText } from "@ritechs/shared";
+import { RichTextArea } from "@/components/admin/form";
+import { RichContent } from "@/components/page/rich-text";
 import { useAdmin } from "@/components/admin/shell";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Labeled, Loading, Pager, Panel, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
@@ -210,7 +212,7 @@ export function MembersView() {
                 <p className="mt-1 text-sm text-muted-ink">
                   {label(c.fromType)} → {label(c.toType)} · {fmtDate(c.createdAt)}
                 </p>
-                <p className="mt-2 max-w-[70ch] text-[0.9375rem] whitespace-pre-line text-ink">{c.reason}</p>
+                <RichContent value={c.reason} compact className="mt-2 max-w-[70ch] text-[0.9375rem] text-ink" />
                 {c.status === "pending" && (
                   <div className="mt-3 flex gap-2">
                     {(["approve", "reject"] as const).map((action) => (
@@ -246,7 +248,7 @@ export function MembersView() {
           pendingLabel={bulk === "reject" ? "Rejecting…" : "Approving…"}
           destructive={bulk === "reject"}
           onConfirm={async () => {
-            const res = await send<{ done: number; failed: { userId: string; message: string }[] }>("/admin/members/review-bulk", "POST", { userIds: selected, action: bulk, ...(bulkNote.trim() ? { note: bulkNote.trim() } : {}) });
+            const res = await send<{ done: number; failed: { userId: string; message: string }[] }>("/admin/members/review-bulk", "POST", { userIds: selected, action: bulk, ...(bulkNote ? { note: bulkNote } : {}) });
             if (!res.ok) {
               toast("error", res.message);
               return true;
@@ -257,9 +259,7 @@ export function MembersView() {
           }}
         >
           {bulk === "reject" && (
-            <Labeled id="bulk-note" label="Note (optional, included in the email)">
-              <Textarea id="bulk-note" value={bulkNote} onChange={(e) => setBulkNote(e.target.value)} maxLength={500} rows={2} />
-            </Labeled>
+            <RichTextArea id="bulk-note" label="Note (optional, included in the email)" value={bulkNote} onChange={setBulkNote} rows={2} max={500} />
           )}
         </Confirm>
       )}
@@ -390,7 +390,7 @@ export function MemberDetailView({ userId }: { userId: string }) {
                   ) : null
                 }
               />
-              <Row k="Biography" v={p.bio ? <span className="whitespace-pre-line">{p.bio}</span> : null} />
+              <Row k="Biography" v={p.bio ? <RichContent value={p.bio} compact /> : null} />
               {p.legacyId && <Row k="Old site id" v={<span className="numerals-tabular">{p.legacyId}</span>} />}
             </dl>
           )}
@@ -401,7 +401,7 @@ export function MemberDetailView({ userId }: { userId: string }) {
             <Panel title="Decision">
               <p className="text-sm text-muted-ink">
                 {p.reviewedAt ? `Last reviewed ${fmtDate(p.reviewedAt)}.` : "Not reviewed yet."}
-                {p.reviewNote ? ` Note: ${p.reviewNote}` : ""}
+                {p.reviewNote ? ` Note: ${richToPlainText(p.reviewNote)}` : ""}
               </p>
               {!user.emailVerified && !p.legacyId && <p className="mt-2 text-sm text-warning">Email not confirmed yet — approval is possible once they confirm.</p>}
               {!user.emailVerified && p.legacyId && <p className="mt-2 text-sm text-muted-ink">Applied on the old site, which did not confirm email addresses. Approving also marks their email as confirmed.</p>}
@@ -465,7 +465,7 @@ export function MemberDetailView({ userId }: { userId: string }) {
           pendingLabel={ACTION_TEXT[action].pending}
           destructive={ACTION_TEXT[action].destructive}
           onConfirm={async () => {
-            const res = await send(`/admin/members/${userId}/review`, "POST", { action, ...(note.trim() ? { note: note.trim() } : {}) });
+            const res = await send(`/admin/members/${userId}/review`, "POST", { action, ...(note ? { note } : {}) });
             if (!res.ok) {
               toast("error", res.message);
               return true;
@@ -475,9 +475,7 @@ export function MemberDetailView({ userId }: { userId: string }) {
           }}
         >
           {action !== "approve" && action !== "reinstate" && (
-            <Labeled id="review-note" label="Note (optional)">
-              <Textarea id="review-note" value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={3} />
-            </Labeled>
+            <RichTextArea id="review-note" label="Note (optional)" value={note} onChange={setNote} rows={3} max={500} />
           )}
         </Confirm>
       )}

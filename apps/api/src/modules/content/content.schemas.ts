@@ -1,11 +1,12 @@
 /** Admin input schemas for content. Rich text is sanitised in the service. */
-import { ATTENDANCE_MODES, EVENT_TYPES, PUBLISH_STATUSES, countryCode, httpsUrl, isoDate, line, paragraphText, slug } from "@ritechs/shared";
+import { ATTENDANCE_MODES, EVENT_TYPES, PUBLISH_STATUSES, countryCode, httpsUrl, isoDate, line, paragraphText, richText, slug } from "@ritechs/shared";
 import { z } from "zod";
 import { listQuery } from "../../common/http.js";
 
 const money = z.union([z.number().nonnegative().max(1_000_000), z.string().regex(/^\d{1,7}(\.\d{1,2})?$/)]).transform(String).nullable().optional();
 const currency = z.string().trim().toUpperCase().regex(/^[A-Z]{3}$/).default("USD");
-const richText = z.string().max(100_000);
+/** Long-form HTML from the editor (articles, page text); sanitised by the services. */
+const richTextBody = z.string().max(100_000);
 const optionalUrl = httpsUrl.nullable().optional();
 const mediaId = z.uuid().nullable().optional();
 const status = z.enum(PUBLISH_STATUSES).default("draft");
@@ -15,15 +16,15 @@ export const conferenceInput = z
     slug,
     acronym: line(40),
     title: line(300),
-    summary: paragraphText(1000).nullable().optional(),
-    objective: paragraphText(5000).nullable().optional(),
-    about: richText.nullable().optional(),
-    joinUs: richText.nullable().optional(),
-    paperSubmission: richText.nullable().optional(),
-    highlights: richText.nullable().optional(),
-    cameraReady: richText.nullable().optional(),
+    summary: richText(1000).nullable().optional(),
+    objective: richText(5000, 0, "full").nullable().optional(),
+    about: richText(50_000, 0, "full").nullable().optional(),
+    joinUs: richText(50_000, 0, "full").nullable().optional(),
+    paperSubmission: richText(50_000, 0, "full").nullable().optional(),
+    highlights: richText(50_000, 0, "full").nullable().optional(),
+    cameraReady: richText(50_000, 0, "full").nullable().optional(),
     cameraReadyUrl: optionalUrl,
-    registrationNote: paragraphText(2000).nullable().optional(),
+    registrationNote: richText(2000).nullable().optional(),
     socialLinks: z.array(z.object({ network: z.enum(["facebook", "linkedin", "twitter", "youtube", "instagram", "website"]), url: httpsUrl })).max(10).default([]),
     publication: z.array(line(500)).max(20).default([]),
     venue: line(200).nullable().optional(),
@@ -59,8 +60,8 @@ export const eventInput = z
     slug,
     type: z.enum(EVENT_TYPES),
     title: line(300),
-    summary: paragraphText(1000).nullable().optional(),
-    description: richText.nullable().optional(),
+    summary: richText(1000).nullable().optional(),
+    description: richText(50_000, 0, "full").nullable().optional(),
     venue: line(200).nullable().optional(),
     location: line(200).nullable().optional(),
     mode: z.enum(ATTENDANCE_MODES).default("in-person"),
@@ -82,8 +83,8 @@ export const newsInput = z.object({
   slug,
   title: line(300),
   category: z.enum(["Webinar", "Workshop", "Seminar", "Conference", "Announcement"]),
-  excerpt: paragraphText(600, 10),
-  body: richText.min(1),
+  excerpt: richText(600, 10),
+  body: richText(100_000, 1, "full"),
   coverId: mediaId,
   /** Only null: removes a photo that is still on the old site. */
   legacyCoverPath: z.null().optional(),
@@ -92,7 +93,7 @@ export const newsInput = z.object({
 });
 export type NewsInput = z.infer<typeof newsInput>;
 
-export const pageInput = z.object({ slug, title: line(200), intro: paragraphText(1000).nullable().optional(), body: richText, metaDescription: line(300).nullable().optional(), status });
+export const pageInput = z.object({ slug, title: line(200), intro: richText(1000).nullable().optional(), body: richTextBody, metaDescription: line(300).nullable().optional(), status });
 export type PageInput = z.infer<typeof pageInput>;
 
 export const organisationInput = z.object({
@@ -114,7 +115,7 @@ export const speakerInput = z.object({
   name: line(200),
   designation: line(200).nullable().optional(),
   organisation: line(200).nullable().optional(),
-  bio: paragraphText(3000).nullable().optional(),
+  bio: richText(3000).nullable().optional(),
   website: optionalUrl,
   photoId: mediaId,
 });
@@ -123,7 +124,7 @@ export type SpeakerInput = z.infer<typeof speakerInput>;
 export const publicationInput = z.object({
   slug,
   title: line(400),
-  abstract: paragraphText(5000, 20),
+  abstract: richText(5000, 20),
   authors: z.array(z.object({ name: line(120), affiliation: line(200).optional() })).min(1).max(50),
   area: z.enum(["ai-ml", "cybersecurity", "data-science", "software-engineering", "sustainable-technology", "emerging-technologies"]),
   type: z.enum(["Journal article", "Conference paper", "Review"]),
@@ -143,7 +144,7 @@ export const expertiseInput = z.object({ name: line(120), active: z.boolean().de
 export const lookupInput = z.object({ kind: z.enum(["reference_style", "required_area"]), name: line(120), position: z.number().int().min(0).max(1000).default(0), active: z.boolean().default(true) });
 export type LookupInput = z.infer<typeof lookupInput>;
 export const lookupQuery = z.object({ kind: z.enum(["reference_style", "required_area"]).optional() });
-export const albumInput = z.object({ slug, title: line(200), description: paragraphText(2000).nullable().optional(), takenOn: isoDate.nullable().optional(), status, items: z
+export const albumInput = z.object({ slug, title: line(200), description: richText(2000).nullable().optional(), takenOn: isoDate.nullable().optional(), status, items: z
     .array(z.object({ mediaId: z.uuid().nullable().optional(), legacyPath: z.string().regex(/^uploads\/[\w.-]{1,200}$/).nullable().optional(), caption: line(300).nullable().optional() }).refine((i) => !!i.mediaId || !!i.legacyPath, { message: "Choose a photo." }))
     .max(300)
     .default([]) });

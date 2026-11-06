@@ -1,5 +1,6 @@
 "use client";
 
+import { RichContent } from "@/components/page/rich-text";
 import Link from "next/link";
 import { FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,7 +35,7 @@ export function AbstractDialog({ publication, trigger }: { publication: Publicat
           </DialogDescription>
 
           <h3 className="mt-6 border-t border-rule pt-5 text-sm font-medium text-ink">Abstract</h3>
-          <p className="mt-2 font-serif text-[1.0625rem] leading-[1.7] text-ink/90 numerals-oldstyle">{publication.abstract}</p>
+          <RichContent value={publication.abstract} className="mt-2 font-serif text-[1.0625rem] leading-[1.7] text-ink/90 numerals-oldstyle" />
 
           <h3 className="mt-5 text-sm font-medium text-ink">Keywords</h3>
           <ul className="mt-2 flex flex-wrap gap-1.5">

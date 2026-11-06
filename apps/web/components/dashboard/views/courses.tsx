@@ -1,11 +1,12 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import { useState } from "react";
 import Link from "next/link";
 import { Pencil, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminPage, Badge, Confirm, Empty, ErrorNote, Loading, Panel, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, RichTextArea, Select, TextInput, focusFirstError } from "@/components/admin/form";
 import { EditDialog } from "@/components/admin/views/library";
 import { send, useApi } from "@/lib/admin/use-api";
 
@@ -102,7 +103,7 @@ export function CoursesView() {
                   <Badge tone={c.active ? "success" : "neutral"}>{c.active ? "Open" : "Hidden"}</Badge>
                 </div>
                 <p className="mt-1 text-sm text-muted-ink">{[courseLength(c), courseFee(c)].filter(Boolean).join(" · ")}</p>
-                {c.description && <p className="mt-3 line-clamp-3 text-sm text-ink/85">{c.description}</p>}
+                {c.description && <p className="mt-3 line-clamp-3 text-sm text-ink/85">{richToPlainText(c.description)}</p>}
                 <div className="mt-auto flex flex-wrap items-center gap-2 pt-4">
                   <Button
                     variant="outline"
@@ -143,7 +144,7 @@ export function CoursesView() {
         {edit && (
           <FormGrid>
             <TextInput id="title" label="Course title" value={edit.f.title} onChange={(v) => set({ title: v })} errors={errors} placeholder="Stepping into research: reference managers…" className="sm:col-span-2" />
-            <TextArea id="description" label="What participants will learn" value={edit.f.description} onChange={(v) => set({ description: v })} errors={errors} rows={5} className="sm:col-span-2" />
+            <RichTextArea id="description" label="What participants will learn" value={edit.f.description} onChange={(v) => set({ description: v })} errors={errors} rows={5} max={3000} className="sm:col-span-2" />
             <TextInput id="duration" label="Length" value={edit.f.duration} onChange={(v) => set({ duration: v.replace(/\D/g, "") })} errors={errors} inputMode="numeric" placeholder="4…" />
             <Select id="durationUnit" label="Unit" value={edit.f.durationUnit} onChange={(v) => set({ durationUnit: v as Form["durationUnit"] })} options={UNITS} errors={errors} />
             <TextInput id="fee" label="Fee" value={edit.f.fee} onChange={(v) => set({ fee: v.replace(/[^\d.]/g, "") })} errors={errors} inputMode="decimal" placeholder="Leave empty if free…" />

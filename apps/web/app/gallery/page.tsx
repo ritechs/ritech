@@ -1,3 +1,4 @@
+import { RichContent } from "@/components/page/rich-text";
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page/page-header";
 import { PageBody, SectionNav, SectionTitle } from "@/components/page/content";
@@ -19,7 +20,7 @@ export default async function GalleryPage() {
         {albums.map((a, i) => (
           <section key={a.slug} aria-labelledby={`album-${a.slug}`}>
             <SectionTitle id={`album-${a.slug}`} className={i === 0 ? "mt-0" : undefined}>{a.title}</SectionTitle>
-            {a.description && <p className="mt-3 text-[1rem] text-muted-ink">{a.description}</p>}
+            {a.description && <RichContent value={a.description} compact className="mt-3 text-[1rem] text-muted-ink" />}
             <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
               {a.photos.map((p) => (
                 <li key={p.url}>

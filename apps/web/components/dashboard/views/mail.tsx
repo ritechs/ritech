@@ -1,12 +1,13 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import { useState } from "react";
 import Link from "next/link";
 import { Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Badge, ErrorNote, Loading, Panel, fmtDate, useToast } from "@/components/admin/ui";
-import { TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { RichTextArea, TextInput, focusFirstError } from "@/components/admin/form";
 import { Avatar, isMentor, useMember } from "@/components/dashboard/shell";
 import { send, useApi } from "@/lib/admin/use-api";
 import { routes } from "@/lib/site";
@@ -47,7 +48,7 @@ export function MailView() {
     e.preventDefault();
     const errs: Record<string, string> = {};
     if (!subject.trim()) errs.subject = "Add a subject, like “Question about my membership”.";
-    if (message.trim().length < 10) errs.message = "Write at least a sentence so the team can help.";
+    if (richToPlainText(message).length < 10) errs.message = "Write at least a sentence so the team can help.";
     setErrors(errs);
     if (Object.keys(errs).length) return focusFirstError(errs);
     setSending(true);
@@ -72,7 +73,7 @@ export function MailView() {
               We reply to <span className="font-medium text-ink">{me.user.email}</span>, usually within two working days.
             </p>
             <TextInput id="subject" label="Subject" value={subject} onChange={setSubject} errors={errors} placeholder="Question about finding a mentor…" />
-            <TextArea id="message" label="Message" value={message} onChange={setMessage} errors={errors} rows={7} />
+            <RichTextArea id="message" label="Message" value={message} onChange={setMessage} errors={errors} rows={7} max={5000} />
             <Button type="submit" disabled={sending}>
               {sending ? <Spinner /> : <Send aria-hidden />}
               {sending ? "Sending…" : "Send to RiTECHS"}
@@ -143,7 +144,7 @@ export function MailView() {
                     <span className="text-xs text-faint-ink">{fmtDate(m.createdAt)}</span>
                   </span>
                 </div>
-                <p className="mt-1 line-clamp-2 text-sm whitespace-pre-line text-muted-ink">{m.message}</p>
+                <p className="mt-1 line-clamp-2 text-sm text-muted-ink">{richToPlainText(m.message)}</p>
               </li>
             ))}
           </ul>

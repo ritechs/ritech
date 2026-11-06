@@ -1,3 +1,4 @@
+import { richExcerpt, richToPlainText } from "@ritechs/shared";
 import type { Metadata } from "next";
 import { PageHeader } from "@/components/page/page-header";
 import { PageBody } from "@/components/page/content";
@@ -10,7 +11,7 @@ type Crumb = { label: string; href?: string };
 export function ManagedPage({ page, crumbs, aside, after }: { page: ManagedPageData; crumbs: Crumb[]; aside?: React.ReactNode; /** Live content kept below the edited text (e.g. the event list). */ after?: React.ReactNode }) {
   return (
     <main id="main" className="flex-1">
-      <PageHeader title={page.title} {...(page.intro ? { description: page.intro } : {})} crumbs={[...crumbs.slice(0, -1), { label: page.title }]} />
+      <PageHeader title={page.title} {...(page.intro ? { description: richToPlainText(page.intro) } : {})} crumbs={[...crumbs.slice(0, -1), { label: page.title }]} />
       <PageBody aside={aside}>
         <RichText html={page.body} />
         {after}
@@ -23,6 +24,6 @@ export function ManagedPage({ page, crumbs, aside, after }: { page: ManagedPageD
 export async function managedMetadata(slug: string, fallback: Metadata): Promise<Metadata> {
   const p = await getManagedPage(slug);
   if (!p) return fallback;
-  const description = p.metaDescription ?? p.intro ?? fallback.description;
+  const description = p.metaDescription ?? (p.intro ? richExcerpt(p.intro, 160) : undefined) ?? fallback.description;
   return { ...fallback, title: p.title, ...(description ? { description } : {}) };
 }

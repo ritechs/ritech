@@ -7,9 +7,9 @@ import { ArrowLeft, ExternalLink, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Badge, Confirm, DataTable, Empty, ErrorNote, Loading, Pager, Panel, fmtDate, label, statusTone, useToast } from "@/components/admin/ui";
-import { FormGrid, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
-import { ImageField } from "@/components/admin/media";
-import { htmlToText, slugify, textToHtml } from "@/lib/admin/text";
+import { FormGrid, RichTextArea, Select, TextInput, focusFirstError } from "@/components/admin/form";
+import { ImageField, uploadEditorImage } from "@/components/admin/media";
+import { slugify } from "@/lib/admin/text";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
 import { useUrlState } from "@/lib/admin/url-state";
 import { routes } from "@/lib/site";
@@ -75,7 +75,7 @@ export function NewsEditor({ id }: { id: string }) {
   useEffect(() => {
     const n = loaded.data;
     if (n && !form) {
-      const raf = requestAnimationFrame(() => setForm({ slug: n.slug, title: n.title, category: n.category, excerpt: n.excerpt, body: htmlToText(n.body), status: n.status, publishedAt: n.publishedAt?.slice(0, 10) ?? "", cover: { id: n.coverId, url: n.coverUrl, changed: false } }));
+      const raf = requestAnimationFrame(() => setForm({ slug: n.slug, title: n.title, category: n.category, excerpt: n.excerpt, body: n.body, status: n.status, publishedAt: n.publishedAt?.slice(0, 10) ?? "", cover: { id: n.coverId, url: n.coverUrl, changed: false } }));
       return () => cancelAnimationFrame(raf);
     }
   }, [loaded.data, form]);
@@ -89,7 +89,7 @@ export function NewsEditor({ id }: { id: string }) {
     const f = form!;
     startSaving(async () => {
       const res = await send<{ id: string }>(isNew ? "/admin/news" : `/admin/news/${id}`, isNew ? "POST" : "PUT", {
-        slug: f.slug.trim() || slugify(f.title), title: f.title.trim(), category: f.category, excerpt: f.excerpt.trim(), body: textToHtml(f.body), status: f.status,
+        slug: f.slug.trim() || slugify(f.title), title: f.title.trim(), category: f.category, excerpt: f.excerpt, body: f.body, status: f.status,
         publishedAt: f.publishedAt ? new Date(`${f.publishedAt}T09:00:00Z`).toISOString() : null,
         ...(f.cover.changed ? { coverId: f.cover.id, ...(f.cover.id === null ? { legacyCoverPath: null } : {}) } : {}),
       });
@@ -137,8 +137,8 @@ export function NewsEditor({ id }: { id: string }) {
             <div className="sm:col-span-2">
               <ImageField label="Cover photo" purpose="cover" url={form.cover.url} name={form.title} onChange={(v) => set({ cover: { ...v, changed: true } })} hint="Shown on the article and in news lists. Without one, an illustration for the category is used." />
             </div>
-            <TextArea id="excerpt" label="Summary" value={form.excerpt} onChange={(v) => set({ excerpt: v })} errors={errors} rows={3} hint="One or two sentences shown in news lists." className="sm:col-span-2" />
-            <TextArea id="body" label="Article" value={form.body} onChange={(v) => set({ body: v })} errors={errors} rows={14} hint="Blank line between paragraphs; “- ” for bullets." className="sm:col-span-2" />
+            <RichTextArea id="excerpt" label="Summary" value={form.excerpt} onChange={(v) => set({ excerpt: v })} errors={errors} rows={3} max={600} hint="One or two sentences shown in news lists." className="sm:col-span-2" />
+            <RichTextArea id="body" label="Article" variant="full" value={form.body} onChange={(v) => set({ body: v })} errors={errors} rows={14} onUploadImage={uploadEditorImage} className="sm:col-span-2" />
           </FormGrid>
         </Panel>
         <div className="flex flex-wrap items-center justify-between gap-3">

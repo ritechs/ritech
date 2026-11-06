@@ -121,3 +121,10 @@ export function SearchBox({ value, onChange, placeholder, label }: { value: stri
     </div>
   );
 }
+
+/** Image button of the rich text editor: uploads to the media library and returns the image address. */
+export async function uploadEditorImage(file: File): Promise<string> {
+  const res = await uploadMedia(file, "content");
+  if (!res.ok) throw new Error(res.message || "The image could not be uploaded.");
+  return res.data.url;
+}

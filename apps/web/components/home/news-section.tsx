@@ -1,3 +1,4 @@
+import { richToPlainText } from "@ritechs/shared";
 import Image from "next/image";
 import Link from "next/link";
 import { Reveal } from "@/components/home/reveal";
@@ -44,7 +45,7 @@ export async function NewsSection() {
                       {a.title}
                     </Link>
                   </h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-ink">{a.excerpt}</p>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-muted-ink">{richToPlainText(a.excerpt)}</p>
                 </div>
               </article>
             </Reveal>

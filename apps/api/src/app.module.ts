@@ -1,3 +1,5 @@
+// Registers the rich text sanitiser used by every richText() field (see common/sanitize.ts).
+import "./common/sanitize.js";
 import { Module, type DynamicModule } from "@nestjs/common";
 import { ScheduleModule } from "@nestjs/schedule";
 import { AuthModule } from "./auth/auth.module.js";

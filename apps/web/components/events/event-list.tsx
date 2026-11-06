@@ -1,3 +1,4 @@
+import { richToPlainText } from "@ritechs/shared";
 import { CalendarDays, MapPin, Ticket, Users } from "lucide-react";
 import { getEvents, type EventType } from "@/lib/server/content";
 import { getToday } from "@/lib/today";
@@ -24,7 +25,7 @@ export async function EventList({ type, empty, className }: { type: EventType; e
                 {!day ? "Coming Soon" : upcoming ? "Upcoming" : "Held"}
               </span>
             </div>
-            {e.summary && <p className="mt-2 line-clamp-4 text-[0.9375rem] leading-relaxed text-muted-ink">{e.summary}</p>}
+            {e.summary && <p className="mt-2 line-clamp-4 text-[0.9375rem] leading-relaxed text-muted-ink">{richToPlainText(e.summary)}</p>}
             <ul className="mt-4 space-y-1.5 text-sm text-ink/85">
               <li className="flex items-start gap-2">
                 <CalendarDays className="mt-0.5 size-4 shrink-0 text-brand" aria-hidden />

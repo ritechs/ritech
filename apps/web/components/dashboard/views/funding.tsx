@@ -1,12 +1,13 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { CalendarClock, ExternalLink, Pencil, Plus, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminPage, Badge, Confirm, Empty, ErrorNote, Loading, Panel, Tabs, fmtDate, statusTone, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, RichTextArea, TextInput, focusFirstError } from "@/components/admin/form";
 import { EditDialog } from "@/components/admin/views/library";
 import { useMember } from "@/components/dashboard/shell";
 import { send, useApi } from "@/lib/admin/use-api";
@@ -60,7 +61,7 @@ function CallCard({ c, children }: { c: Call; children: React.ReactNode }) {
           )}
         </span>
       </p>
-      {c.description && <p className="mt-3 line-clamp-4 text-sm whitespace-pre-line text-ink/85">{c.description}</p>}
+      {c.description && <p className="mt-3 line-clamp-4 text-sm text-ink/85">{richToPlainText(c.description)}</p>}
       {c.topics.length > 0 && (
         <ul className="mt-3 flex flex-wrap gap-1.5">
           {c.topics.map((t) => (
@@ -215,7 +216,7 @@ function FundingInner() {
         {edit && (
           <FormGrid>
             <TextInput id="title" label="Title" value={edit.f.title} onChange={(v) => set({ title: v })} errors={errors} placeholder="Fully funded PhD place in edge AI…" className="sm:col-span-2" />
-            <TextArea id="description" label="Description" value={edit.f.description} onChange={(v) => set({ description: v })} errors={errors} rows={6} hint="Who can apply, what is funded and how to apply." className="sm:col-span-2" />
+            <RichTextArea id="description" label="Description" value={edit.f.description} onChange={(v) => set({ description: v })} errors={errors} rows={6} max={5000} hint="Who can apply, what is funded and how to apply." className="sm:col-span-2" />
             <TextInput id="deadline" label="Deadline" type="date" value={edit.f.deadline} onChange={(v) => set({ deadline: v })} errors={errors} />
             <TextInput id="link" label="More information (optional)" type="url" inputMode="url" spellCheck={false} value={edit.f.link} onChange={(v) => set({ link: v })} errors={errors} placeholder="https://…" />
             <fieldset className="sm:col-span-2">
@@ -258,7 +259,7 @@ function FundingInner() {
         description={apply ? `${apply.title} — posted by ${apply.owner.name}` : undefined}
         saving={saving}
         onSave={async () => {
-          if (note.trim().length < 10) {
+          if (richToPlainText(note).length < 10) {
             setErrors({ note: "Write a few lines about yourself and why you are applying." });
             return focusFirstError({ note: "x" });
           }
@@ -271,7 +272,7 @@ function FundingInner() {
           void calls.reload();
         }}
       >
-        <TextArea id="note" label="Your message" value={note} onChange={setNote} errors={errors} rows={6} hint={`${apply?.owner.name ?? "They"} will see your name, position and organisation, and receive your email address only if they accept.`} />
+        <RichTextArea id="note" label="Your message" value={note} onChange={setNote} errors={errors} rows={6} max={2000} hint={`${apply?.owner.name ?? "They"} will see your name, position and organisation, and receive your email address only if they accept.`} />
       </EditDialog>
 
       <Confirm

@@ -1,3 +1,4 @@
+import { isRichHtml, richToPlainText, textToRichHtml } from "@ritechs/shared";
 import "server-only";
 
 /**
@@ -237,7 +238,8 @@ const format = (mode: string): Conference["format"] => (mode === "hybrid" ? "Hyb
 const has = (v: unknown) => (v ? v : undefined);
 
 function fromApiConference(c: any): ConferencePage {
-  const notes = [c.registrationNote, ...(c.fees ?? []).map((f: any) => f.note)].filter(Boolean);
+  // The registration note is rich text; fee notes are plain. Both become HTML for RichContent.
+  const notes = [c.registrationNote, ...(c.fees ?? []).map((f: any) => f.note)].filter(Boolean).map((n: string) => (isRichHtml(n) ? n : textToRichHtml(n)));
   const speakers = (c.speakers ?? []).map((s: any) => ({ name: s.name, ...(s.designation ? { role: s.designation } : {}), ...(s.organisation ? { organisation: s.organisation } : {}), ...(s.photoUrl ? { photo: s.photoUrl } : {}) }));
   const details: ConferenceDetails = {
     fees: (c.fees ?? []).map((f: any) => {
@@ -258,7 +260,7 @@ function fromApiConference(c: any): ConferencePage {
   const optional = {
     highlightsHtml: has(c.highlights), aboutHtml: has(c.about), joinUsHtml: has(c.joinUs), submissionHtml: has(c.paperSubmission), cameraReadyHtml: has(c.cameraReady),
     cameraReadyUrl: has(c.cameraReadyUrl), cameraReadyFileUrl: has(c.cameraReadyFileUrl), callForPapersUrl: has(c.callForPapersUrl), coverUrl: has(c.coverUrl),
-    feesNote: notes.length ? notes.join(" ") : undefined,
+    feesNote: notes.length ? notes.join("") : undefined,
   };
   for (const [k, v] of Object.entries(optional)) if (v) (details as any)[k] = v;
   return {
@@ -356,7 +358,7 @@ export async function getFeaturedConference(): Promise<AcademicEvent | null> {
   if (!c?.startDate) return null;
   const endsAt = c.endDate ?? c.startDate;
   const next = c.keyDates.find((k) => k.date >= today);
-  const about = c.objective ?? firstSentences(c.details.aboutHtml, 2000);
+  const about = c.objective ? richToPlainText(c.objective) : firstSentences(c.details.aboutHtml, 2000);
   return {
     id: `conference-${c.slug}`,
     slug: c.slug,
@@ -368,7 +370,7 @@ export async function getFeaturedConference(): Promise<AcademicEvent | null> {
     allDay: true,
     mode: c.format === "Hybrid" ? "Hybrid" : "In person",
     location: c.format === "Hybrid" && c.location ? `${c.location} — in person and online` : (c.location ?? ""),
-    summary: c.summary ?? firstSentences(c.details.highlightsHtml || c.details.aboutHtml) ?? c.title,
+    summary: (c.summary ? richToPlainText(c.summary) : null) ?? firstSentences(c.details.highlightsHtml || c.details.aboutHtml) ?? c.title,
     description: about || c.title,
     registration: endsAt >= today ? { status: "open", note: next ? `${next.label}: ${next.date}` : "" } : { status: "closed", note: "" },
     keyDates: c.keyDates.filter((k) => k.date >= today).slice(0, 5),

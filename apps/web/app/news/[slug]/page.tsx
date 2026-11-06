@@ -1,3 +1,4 @@
+import { richExcerpt } from "@ritechs/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Image from "next/image";
@@ -17,7 +18,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps<"/news/[slug]">): Promise<Metadata> {
   const { slug } = await params;
   const a = await getNewsArticle(slug);
-  return a ? { title: a.title, description: a.excerpt } : { title: "Article not found" };
+  return a ? { title: a.title, description: richExcerpt(a.excerpt, 160) } : { title: "Article not found" };
 }
 
 async function NewsArticlePageContent({ params }: { params: PageProps<"/news/[slug]">["params"] }) {

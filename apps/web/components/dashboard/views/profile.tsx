@@ -1,12 +1,13 @@
 "use client";
 
+import { richToPlainText } from "@ritechs/shared";
 import { useRef, useState } from "react";
 import Link from "next/link";
 import { Camera, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Panel, useToast } from "@/components/admin/ui";
-import { Check, FormGrid, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { Check, FormGrid, RichTextArea, Select, TextInput, focusFirstError } from "@/components/admin/form";
 import { Avatar, isMentor, useMember } from "@/components/dashboard/shell";
 import { apiRaw } from "@/lib/api/client";
 import type { CountryOption } from "@/lib/countries";
@@ -117,7 +118,7 @@ export function ProfileView({ countries, section = "basic" }: { countries: Count
       if (!f.affiliation.trim()) local.affiliation = "Enter your university or organisation.";
     }
     if (section === "scholar" && f.citations && !/^\d{1,8}$/.test(f.citations)) local.citations = "Enter a whole number, like 1520.";
-    if (section === "biography" && f.bio.length > BIO_MAX) local.bio = `Use ${BIO_MAX} characters or fewer.`;
+    if (section === "biography" && richToPlainText(f.bio).length > BIO_MAX) local.bio = `Use ${BIO_MAX} characters or fewer.`;
     if (Object.keys(local).length) {
       setErrors(local);
       focusFirstError(local);
@@ -217,14 +218,15 @@ export function ProfileView({ countries, section = "basic" }: { countries: Count
           <Panel>
             <div className="space-y-5">
               <TextInput id="researchField" label={mentor ? "Field of research" : "Field of study or research"} value={f.researchField} onChange={(v) => set({ researchField: v })} errors={errors} placeholder={mentor ? "Wireless networks and IoT…" : "Machine learning for healthcare…"} />
-              <TextArea
+              <RichTextArea
                 id="bio"
+                max={BIO_MAX}
                 label={mentor ? "About you and your research" : "About you"}
                 value={f.bio}
                 onChange={(v) => set({ bio: v })}
                 errors={errors}
                 rows={12}
-                hint={`${f.bio.length} / ${BIO_MAX} characters. ${mentor ? "Mention your research interests and how you can help." : "Say what you study, your goals, and what you would like a mentor to help with."}`}
+                hint={`${mentor ? "Mention your research interests and how you can help." : "Say what you study, your goals, and what you would like a mentor to help with."}`}
               />
             </div>
           </Panel>

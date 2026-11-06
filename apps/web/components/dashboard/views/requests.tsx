@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import { RichContent } from "@/components/page/rich-text";
 import Link from "next/link";
 import { Check, Mail, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AdminPage, Badge, Empty, ErrorNote, Loading, Pager, Panel, Tabs, fmtDate, statusTone, useToast } from "@/components/admin/ui";
-import { TextArea } from "@/components/admin/form";
+import { RichTextArea } from "@/components/admin/form";
 import { EditDialog } from "@/components/admin/views/library";
 import { Avatar, useMember } from "@/components/dashboard/shell";
 import { qs, send, useApi, type Paged } from "@/lib/admin/use-api";
@@ -59,7 +60,7 @@ function About({ name, profile }: { name: string; profile: NonNullable<RequestRo
             {profile.expertise.join(", ")}
           </p>
         )}
-        {profile.bio && <p className="whitespace-pre-line text-ink/85">{profile.bio}</p>}
+        {profile.bio && <RichContent value={profile.bio} compact className="text-ink/85" />}
         {profile.projects.length > 0 && (
           <div>
             <p className="text-faint-ink">Projects</p>
@@ -196,11 +197,12 @@ export function RequestsView() {
                         <span className="font-medium">{REQUEST_KIND[r.kind]}</span>
                         {r.subject ? `: ${r.subject}` : ""} · <span className="text-faint-ink">{fmtDate(r.createdAt)}</span>
                       </p>
-                      {r.message && <p className="mt-1.5 rounded-md bg-paper px-3 py-2 text-sm whitespace-pre-line text-ink/85">{r.message}</p>}
+                      {r.message && <RichContent value={r.message} compact className="mt-1.5 rounded-md bg-paper px-3 py-2 text-sm text-ink/85" />}
                       {r.reply && (
-                        <p className="mt-1.5 text-sm text-muted-ink">
-                          <span className="font-medium text-ink">{box === "in" ? "Your reply" : "Reply"}:</span> {r.reply}
-                        </p>
+                        <div className="mt-1.5 text-sm text-muted-ink">
+                          <span className="font-medium text-ink">{box === "in" ? "Your reply" : "Reply"}:</span>
+                          <RichContent value={r.reply} compact className="mt-0.5" />
+                        </div>
                       )}
                       {r.person.profile && r.person.type === "mentee" && <About name={r.person.name} profile={r.person.profile} />}
                       {r.person.email && (
@@ -265,7 +267,7 @@ export function RequestsView() {
         saveLabel={action?.status === "accepted" ? "Accept" : action?.status === "withdrawn" ? "Withdraw" : action?.row.status === "accepted" ? "End" : "Decline"}
         savingLabel="Saving…"
       >
-        {action && action.status !== "withdrawn" && <TextArea id="reply" label="Message to them (optional)" value={reply} onChange={setReply} rows={4} hint={action.status === "accepted" ? "For example, when and how you would like to meet." : undefined} />}
+        {action && action.status !== "withdrawn" && <RichTextArea id="reply" label="Message to them (optional)" value={reply} onChange={setReply} rows={4} max={2000} hint={action.status === "accepted" ? "For example, when and how you would like to meet." : undefined} />}
         {action?.status === "withdrawn" && <p className="text-sm text-muted-ink">You can send a new request later if you change your mind.</p>}
       </EditDialog>
     </AdminPage>

@@ -1,5 +1,6 @@
 "use client";
 
+import { uploadEditorImage } from "@/components/admin/media";
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -7,9 +8,9 @@ import { ArrowLeft, ExternalLink, Plus, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { AdminPage, Badge, Confirm, Empty, ErrorNote, Loading, Panel, fmtDate, useToast } from "@/components/admin/ui";
-import { FormGrid, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
+import { FormGrid, RichTextArea, Select, TextArea, TextInput, focusFirstError } from "@/components/admin/form";
 import { SITE_PAGES, pageHref, sitePage } from "@/lib/content/site-pages";
-import { htmlToText, slugify, textToHtml } from "@/lib/admin/text";
+import { slugify } from "@/lib/admin/text";
 import { apiRaw } from "@/lib/api/client";
 import { send, useApi } from "@/lib/admin/use-api";
 import { cn } from "@/lib/utils";
@@ -115,7 +116,8 @@ interface Saved { slug: string; title: string; intro: string | null; body: strin
 interface Form { slug: string; title: string; intro: string; text: string; html: string; mode: "text" | "html"; metaDescription: string; status: string }
 
 /** Formatting the simple editor can't represent (headings, links, bold, images, tables). */
-const RICH = /<(h[1-6]|a|strong|b|em|i|img|table|blockquote|ol)\b/i;
+/** Pages using HTML the editor cannot edit (tables, figures, code) open in the HTML view. */
+const RAW_ONLY = /<(table|figure|pre|code|h4|iframe)\b/i;
 
 export function PageEditor({ slug: param }: { slug: string }) {
   const isNew = param === "new";
@@ -137,7 +139,7 @@ export function PageEditor({ slug: param }: { slug: string }) {
     const raf = requestAnimationFrame(() =>
       setForm(
         p
-          ? { slug: p.slug, title: p.title, intro: p.intro ?? "", text: htmlToText(p.body), html: p.body, mode: RICH.test(p.body) ? "html" : "text", metaDescription: p.metaDescription ?? "", status: p.status }
+          ? { slug: p.slug, title: p.title, intro: p.intro ?? "", text: p.body, html: p.body, mode: RAW_ONLY.test(p.body) ? "html" : "text", metaDescription: p.metaDescription ?? "", status: p.status }
           : { slug: param, title: builtIn?.title ?? param, intro: "", text: "", html: "", mode: "text", metaDescription: "", status: "draft" },
       ),
     );
@@ -151,13 +153,13 @@ export function PageEditor({ slug: param }: { slug: string }) {
   const switchMode = (mode: Form["mode"]) => {
     if (mode === form.mode) return;
     // Text → HTML keeps everything; HTML → text drops formatting the simple editor can't show, so it starts from the HTML's text.
-    set(mode === "html" ? { mode, html: form.html && htmlToText(form.html) === form.text ? form.html : textToHtml(form.text) } : { mode, text: htmlToText(form.html) });
+    set(mode === "html" ? { mode, html: form.text } : { mode, text: form.html });
   };
 
   function save(e: React.FormEvent) {
     e.preventDefault();
     const f = form!;
-    const body = f.mode === "html" ? f.html.trim() : f.text.trim() ? (f.html && htmlToText(f.html) === f.text ? f.html : textToHtml(f.text)) : "";
+    const body = (f.mode === "html" ? f.html : f.text).trim();
     const local: Record<string, string> = {};
     if (!f.title.trim()) local.title = "Enter the page title.";
     if (f.status === "published" && !body) local[f.mode === "html" ? "html" : "text"] = "Write the page text before publishing.";
@@ -181,7 +183,7 @@ export function PageEditor({ slug: param }: { slug: string }) {
           return;
         }
       }
-      const res = await send<Saved>("/admin/pages", "PUT", { slug, title: f.title.trim(), intro: f.intro.trim() || null, body, metaDescription: f.metaDescription.trim() || null, status: f.status });
+      const res = await send<Saved>("/admin/pages", "PUT", { slug, title: f.title.trim(), intro: f.intro || null, body, metaDescription: f.metaDescription.trim() || null, status: f.status });
       if (!res.ok) {
         setErrors(res.fields ?? {});
         focusFirstError(res.fields ?? {});
@@ -240,7 +242,7 @@ export function PageEditor({ slug: param }: { slug: string }) {
                 <p className="mt-2.5 text-[0.9375rem] text-muted-ink">ritechs.org{href}</p>
               </div>
             )}
-            <TextArea id="intro" label="Introduction (optional)" value={form.intro} onChange={(v) => set({ intro: v })} errors={errors} rows={2} className="sm:col-span-2" hint="One or two sentences shown under the title." />
+            <RichTextArea id="intro" label="Introduction (optional)" value={form.intro} onChange={(v) => set({ intro: v })} errors={errors} rows={2} max={1000} className="sm:col-span-2" hint="One or two sentences shown under the title." />
           </FormGrid>
         </Panel>
 
@@ -250,7 +252,7 @@ export function PageEditor({ slug: param }: { slug: string }) {
             <div role="radiogroup" aria-label="Editor" className="inline-flex rounded-md border border-rule p-0.5">
               {(
                 [
-                  ["text", "Simple"],
+                  ["text", "Editor"],
                   ["html", "HTML"],
                 ] as const
               ).map(([m, l]) => (
@@ -269,7 +271,7 @@ export function PageEditor({ slug: param }: { slug: string }) {
           }
         >
           {form.mode === "text" ? (
-            <TextArea id="text" label="Page text" value={form.text} onChange={(v) => set({ text: v })} errors={{ text: textError ?? "" }} rows={18} hint="Leave a blank line between paragraphs. Start lines with “- ” for a bullet list. For headings, links and bold text, switch to HTML." />
+            <RichTextArea id="text" label="Page text" variant="full" value={form.text} onChange={(v) => set({ text: v })} errors={{ text: textError ?? "" }} rows={18} onUploadImage={uploadEditorImage} hint="For tables or anything the toolbar cannot do, switch to HTML." />
           ) : (
             <TextArea id="html" label="Page HTML" value={form.html} onChange={(v) => set({ html: v })} errors={{ html: textError ?? "" }} rows={18} hint="Allowed: headings (h2–h4), paragraphs, lists, links, bold and italic, images, tables, quotes. Anything else (scripts, styles) is removed when you save." />
           )}

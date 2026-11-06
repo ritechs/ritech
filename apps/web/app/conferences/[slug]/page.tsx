@@ -1,3 +1,4 @@
+import { isRichHtml, richExcerpt, richToPlainText, textToRichHtml } from "@ritechs/shared";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import Link from "next/link";
@@ -5,8 +6,8 @@ import { notFound } from "next/navigation";
 import { CalendarDays, Download, ExternalLink, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/page/page-header";
-import { BulletList, ContactCard, PageBody, Prose, SectionTitle } from "@/components/page/content";
-import { RichText } from "@/components/page/rich-text";
+import { BulletList, ContactCard, PageBody, SectionTitle } from "@/components/page/content";
+import { RichContent, RichText } from "@/components/page/rich-text";
 import { ConferenceStatus, conferenceStatus } from "@/components/conferences/conference-card";
 import { LegacyImage } from "@/components/media/legacy-image";
 import { getConferencePage, getConferences, type FeeRow } from "@/lib/server/content";
@@ -20,7 +21,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: PageProps<"/conferences/[slug]">): Promise<Metadata> {
   const c = await getConferencePage(decodeURIComponent((await params).slug));
-  return c ? { title: `${c.acronym} — ${c.title}`, description: (c.summary ?? c.objective ?? plain(c.details.aboutHtml)).slice(0, 155) } : { title: "Conference not found" };
+  return c ? { title: `${c.acronym} — ${c.title}`, description: richExcerpt(c.summary ?? c.objective ?? c.details.aboutHtml, 155) } : { title: "Conference not found" };
 }
 
 const plain = (html?: string) => (html ?? "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
@@ -142,10 +143,10 @@ async function ConferencePageContent({ params }: { params: PageProps<"/conferenc
           </div>
         )}
         {d.aboutHtml && <RichText html={d.aboutHtml} />}
-        {c.objective && !norm(plain(d.aboutHtml)).includes(norm(c.objective).slice(0, 120)) && (
+        {c.objective && !norm(plain(d.aboutHtml)).includes(norm(richToPlainText(c.objective)).slice(0, 120)) && (
           <>
             <SectionTitle className={d.aboutHtml ? undefined : "mt-0"}>Objective</SectionTitle>
-            <Prose paragraphs={[c.objective]} className="mt-4" />
+            <RichText html={isRichHtml(c.objective) ? c.objective : textToRichHtml(c.objective)} className="mt-4" />
           </>
         )}
         {c.publication.length > 0 && !d.highlightsHtml && (
@@ -256,7 +257,7 @@ async function ConferencePageContent({ params }: { params: PageProps<"/conferenc
         {d.fees.length > 0 && (
           <>
             <SectionTitle>Registration Fees</SectionTitle>
-            {d.feesNote && <p className="mt-3 text-[0.9375rem] text-muted-ink">{d.feesNote}</p>}
+            {d.feesNote && <RichContent value={d.feesNote} compact className="mt-3 text-[0.9375rem] text-muted-ink" />}
             <div className="mt-6 overflow-x-auto rounded-lg border border-rule">
               <table className="w-full min-w-[28rem] text-left text-[0.9375rem]">
                 <caption className="sr-only">{c.acronym} registration fees</caption>
