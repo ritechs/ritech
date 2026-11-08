@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { MentorCard } from "@/components/mentors/mentor-card";
+import { MentorTile } from "@/components/home/mentor-tile";
 import type { Mentor } from "@/lib/types";
 
-/** All popular mentors in a two-row strip that scrolls sideways, with previous/next buttons. */
+/** All popular mentors in a row of portrait cards that scrolls sideways, with previous/next buttons. */
 export function MentorStrip({ mentors }: { mentors: Mentor[] }) {
   const ref = useRef<HTMLUListElement>(null);
   const [edge, setEdge] = useState({ start: true, end: false });
@@ -50,14 +50,11 @@ export function MentorStrip({ mentors }: { mentors: Mentor[] }) {
         id="mentor-strip"
         ref={ref}
         aria-label="Popular mentors"
-        className="-mx-2 mt-3 grid snap-x snap-mandatory scroll-px-2 auto-cols-[minmax(17rem,85%)] grid-flow-col grid-rows-2 gap-5 overflow-x-auto px-2 pt-3 pb-6 [scrollbar-width:thin] sm:auto-cols-[minmax(19rem,calc(50%-0.625rem))]"
+        className="-mx-2 mt-3 grid snap-x snap-mandatory scroll-px-2 auto-cols-[72%] grid-flow-col gap-5 overflow-x-auto px-2 pt-3 pb-6 [scrollbar-width:thin] sm:auto-cols-[calc(50%-0.625rem)] md:auto-cols-[calc((100%-2.5rem)/3)]"
       >
         {mentors.map((m) => (
-          <li
-            key={m.slug}
-            className="snap-start rounded-lg border-t-4 border-highlight bg-surface shadow-[0_14px_30px_-16px_rgb(18_24_30/0.4)] ring-1 ring-brand/10 transition-[transform,box-shadow] duration-300 hover:-translate-y-1 hover:shadow-[0_22px_40px_-18px_rgb(18_24_30/0.5)] [&>article]:rounded-t-none [&>article]:border-0"
-          >
-            <MentorCard mentor={m} />
+          <li key={m.slug} className="snap-start">
+            <MentorTile mentor={m} />
           </li>
         ))}
       </ul>

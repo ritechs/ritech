@@ -16,6 +16,7 @@ export function LegacyImage({
   className,
   fit = "cover",
   fallback,
+  onSize,
 }: {
   path?: string;
   alt: string;
@@ -23,12 +24,19 @@ export function LegacyImage({
   className?: string;
   fit?: "cover" | "contain";
   fallback: React.ReactNode;
+  /** Called with the loaded image's pixel size (e.g. to treat small old photos differently). */
+  onSize?: (width: number, height: number) => void;
 }) {
   const [failed, setFailed] = useState(false);
   // An image can fail before hydration attaches onError; catch that on mount.
-  const checkLoaded = useCallback((img: HTMLImageElement | null) => {
-    if (img && img.complete && img.naturalWidth === 0) requestAnimationFrame(() => setFailed(true));
-  }, []);
+  const checkLoaded = useCallback(
+    (img: HTMLImageElement | null) => {
+      if (!img || !img.complete) return;
+      if (img.naturalWidth === 0) requestAnimationFrame(() => setFailed(true));
+      else if (onSize) requestAnimationFrame(() => onSize(img.naturalWidth, img.naturalHeight));
+    },
+    [onSize],
+  );
   if (!path || failed) return <>{fallback}</>;
   return (
     <Image
@@ -39,6 +47,7 @@ export function LegacyImage({
       sizes={sizes}
       unoptimized={!isOptimisable(path)}
       onError={() => setFailed(true)}
+      onLoad={onSize ? (e) => onSize(e.currentTarget.naturalWidth, e.currentTarget.naturalHeight) : undefined}
       className={cn(fit === "cover" ? "object-cover object-top" : "object-contain", className)}
     />
   );
